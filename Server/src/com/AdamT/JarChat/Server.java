@@ -14,8 +14,6 @@ import java.awt.*;
 
 public class Server {
     //Class variables
-    static JFrame f;
-    static ImageIcon iii;
 
     public static void main(String[] args) {
         System.out.println("Hi!");
@@ -28,16 +26,22 @@ public class Server {
         catch (Exception e) {
             e.printStackTrace();
         }
+        new myFrame("JarChat - Server");    //Creates instance of the UI's frame
+    }
+}
 
-        f = new JFrame("JarChat - Server");    //Creates instance of the UI's frame
-        f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        f.setSize(800,600);
+class myFrame extends JFrame {
+    myFrame(String title) {
+        ImageIcon iii;
+        this.setTitle(title);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setSize(800,600);
         /*
-         * f.setResizable(false);    //Testing for size
+         * this.setResizable(false);    //Testing for size
          * iii = new ImageIcon("Path to logo");    //For icon (later)
-         * f.setIconImage(iii.getImage());
+         * this.setIconImage(iii.getImage());
          */
-        f.setVisible(true);
-        f.getContentPane().setBackground(new Color(0x2a2e32));
+        this.setVisible(true);
+        this.getContentPane().setBackground(new Color(0x2a2e32));
     }
 }
