@@ -10,6 +10,7 @@ package com.AdamT.JarChat;
 import java.lang.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.*;
 
 public class Server {
     //Class variables
@@ -37,5 +38,6 @@ public class Server {
          * f.setIconImage(iii.getImage());
          */
         f.setVisible(true);
+        f.getContentPane().setBackground(new Color(0x2a2e32));
     }
 }
