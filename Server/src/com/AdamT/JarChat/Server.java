@@ -55,7 +55,7 @@ class myFrame extends JFrame {
         header.add(paddingLeft,BorderLayout.WEST);
 
         JLabel heading = new JLabel("JarChat");
-
+        header.add(heading,BorderLayout.CENTER);
 
         this.add(header,BorderLayout.NORTH);
     }
