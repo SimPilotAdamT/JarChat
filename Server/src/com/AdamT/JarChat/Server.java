@@ -32,16 +32,31 @@ public class Server {
 
 class myFrame extends JFrame {
     myFrame(String title) {
-        ImageIcon iii;
         this.setTitle(title);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setSize(800,600);
         /*
          * this.setResizable(false);    //Testing for size
-         * iii = new ImageIcon("Path to logo");    //For icon (later)
+         * ImageIcon iii = new ImageIcon("Path to logo");    //For icon (later)
          * this.setIconImage(iii.getImage());
          */
         this.setVisible(true);
         this.getContentPane().setBackground(new Color(0x2a2e32));
+        this.setLayout(new BorderLayout());
+
+        JPanel header = new JPanel();
+        header.setBackground(Color.green);
+        header.setPreferredSize(new Dimension(50,50));
+        header.setLayout(new BorderLayout());
+
+        JPanel paddingLeft = new JPanel();
+        paddingLeft.setBackground(Color.red);
+        paddingLeft.setPreferredSize(new Dimension(20,50));
+        header.add(paddingLeft,BorderLayout.WEST);
+
+        JLabel heading = new JLabel("JarChat");
+
+
+        this.add(header,BorderLayout.NORTH);
     }
 }
