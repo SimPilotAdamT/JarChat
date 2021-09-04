@@ -5,7 +5,7 @@
  * Built using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2021-09-04 22:10Z by SimPilotAdamT
+ * Last Edited: 2021-09-04 22:45Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
