@@ -1,7 +1,11 @@
 /*
  * JarChat Client Source Code
  * Free and Open-sourced under the GNU GPL v3 Licence
- * Last Edited: 2021-09-02 22:30Z by SimPilotAdamT
+ *
+ * Built using the latest JDK 8 to ensure compatibility with all
+ * modern devices. Will change JDK once more devices use JDK 11.
+ *
+ * Last Edited: 2021-09-04 22:10Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
@@ -37,7 +41,7 @@ class firstFrame extends JFrame {
     JButton btLogIn;
     JButton btRegBut;
     JLabel lbLab0;
-    JLabel lbLab2;
+    JLabel lbLab1;
     firstFrame(String title) {
         pnP = new JPanel();
         pnP.setBorder(BorderFactory.createTitledBorder(""));
@@ -79,6 +83,7 @@ class firstFrame extends JFrame {
         gbcP.weighty = 0;
         gbcP.anchor = GridBagConstraints.NORTH;
         gbP.setConstraints(btLogIn, gbcP);
+        btLogIn.setFont(btLogIn.getFont().deriveFont(16f));
         pnP.add(btLogIn);
 
         btRegBut = new JButton("Register");
@@ -91,9 +96,10 @@ class firstFrame extends JFrame {
         gbcP.weighty = 0;
         gbcP.anchor = GridBagConstraints.NORTH;
         gbP.setConstraints(btRegBut, gbcP);
+        btRegBut.setFont(btRegBut.getFont().deriveFont(16f));
         pnP.add(btRegBut);
 
-        lbLab0 = new JLabel("Username");
+        lbLab0 = new JLabel("Username:");
         gbcP.gridx = 5;
         gbcP.gridy = 5;
         gbcP.gridwidth = 16;
@@ -103,9 +109,10 @@ class firstFrame extends JFrame {
         gbcP.weighty = 1;
         gbcP.anchor = GridBagConstraints.NORTH;
         gbP.setConstraints(lbLab0, gbcP);
+        lbLab0.setFont(lbLab0.getFont().deriveFont(16f));
         pnP.add(lbLab0);
 
-        lbLab2 = new JLabel("Password");
+        lbLab1 = new JLabel("Password:");
         gbcP.gridx = 5;
         gbcP.gridy = 9;
         gbcP.gridwidth = 16;
@@ -114,8 +121,9 @@ class firstFrame extends JFrame {
         gbcP.weightx = 1;
         gbcP.weighty = 1;
         gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(lbLab2, gbcP);
-        pnP.add(lbLab2);
+        gbP.setConstraints(lbLab1, gbcP);
+        lbLab1.setFont(lbLab1.getFont().deriveFont(16f));
+        pnP.add(lbLab1);
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 

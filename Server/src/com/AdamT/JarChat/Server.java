@@ -1,7 +1,11 @@
 /*
  * JarChat Server Source Code
  * Free and Open-sourced under the GNU GPL v3 Licence
- * Last Edited: 2021-09-02 22:30Z by SimPilotAdamT
+ *
+ * Built using the latest JDK 8 to ensure compatibility with all
+ * modern devices. Will change JDK once more devices use JDK 11.
+ *
+ * Last Edited: 2021-09-04 22:10Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
