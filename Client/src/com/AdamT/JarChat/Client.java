@@ -1,5 +1,5 @@
 /*
- * JarChat Server Source Code
+ * JarChat Client Source Code
  * Free and Open-sourced under the GNU GPL v3 Licence
  * Last Edited: 2021-09-02 22:30Z by SimPilotAdamT
  */
@@ -12,7 +12,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class Server {
+public class Client {
     //Class variables
 
     public static void main(String[] args) {
@@ -26,7 +26,7 @@ public class Server {
         catch (Exception e) {
             e.printStackTrace();
         }
-        new myFrame("JarChat - Server");    //Creates instance of the UI's frame
+        new myFrame("JarChat - Client");    //Creates instance of the UI's frame
     }
 }
 
@@ -135,7 +135,7 @@ class myFrame extends JFrame {
         JScrollPane scpP = new JScrollPane(pnP);
         this.setContentPane(scpP);
         this.pack();
-        this.setTitle(title);
+        this.setTitle(title+" | Login");
         this.setVisible(true);
     }
 }
