@@ -14,6 +14,7 @@ package com.AdamT.JarChat;
 import java.lang.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class Client {
@@ -48,6 +49,7 @@ class firstFrame extends JFrame {
         GridBagLayout gbP = new GridBagLayout();
         GridBagConstraints gbcP = new GridBagConstraints();
         pnP.setLayout(gbP);
+        pnP.setBorder(new EmptyBorder(5,5,5,5));
 
         tfName = new JTextField();
         gbcP.gridx = 5;
@@ -127,10 +129,10 @@ class firstFrame extends JFrame {
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JScrollPane scpP = new JScrollPane(pnP);
-        this.setContentPane(scpP);
+        this.setContentPane(pnP);
         this.setTitle(title+" | Login");
-        this.setVisible(true);
         this.setSize(new Dimension(320,160));
+        this.setResizable(false);
+        this.setVisible(true);
     }
 }
