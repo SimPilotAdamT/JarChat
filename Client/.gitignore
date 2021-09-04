@@ -3,4 +3,5 @@
 .run
 *.iml
 #Compier Output (only upload will be the JAR at every release)
+META-INF
 out

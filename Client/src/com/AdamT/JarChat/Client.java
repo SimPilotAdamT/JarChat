@@ -26,11 +26,11 @@ public class Client {
         catch (Exception e) {
             e.printStackTrace();
         }
-        new myFrame("JarChat - Client");    //Creates instance of the UI's frame
+        new firstFrame("JarChat - Client");    //Creates instance of the UI's frame
     }
 }
 
-class myFrame extends JFrame {
+class firstFrame extends JFrame {
     JPanel pnP;
     JTextField tfName;
     JTextField tfPass;
@@ -38,8 +38,7 @@ class myFrame extends JFrame {
     JButton btRegBut;
     JLabel lbLab0;
     JLabel lbLab2;
-    JLabel lbLab3;
-    myFrame(String title) {
+    firstFrame(String title) {
         pnP = new JPanel();
         pnP.setBorder(BorderFactory.createTitledBorder(""));
         GridBagLayout gbP = new GridBagLayout();
@@ -49,7 +48,7 @@ class myFrame extends JFrame {
         tfName = new JTextField();
         gbcP.gridx = 5;
         gbcP.gridy = 7;
-        gbcP.gridwidth = 10;
+        gbcP.gridwidth = 16;
         gbcP.gridheight = 2;
         gbcP.fill = GridBagConstraints.BOTH;
         gbcP.weightx = 1;
@@ -61,7 +60,7 @@ class myFrame extends JFrame {
         tfPass = new JTextField();
         gbcP.gridx = 5;
         gbcP.gridy = 11;
-        gbcP.gridwidth = 10;
+        gbcP.gridwidth = 16;
         gbcP.gridheight = 2;
         gbcP.fill = GridBagConstraints.BOTH;
         gbcP.weightx = 1;
@@ -97,7 +96,7 @@ class myFrame extends JFrame {
         lbLab0 = new JLabel("Username");
         gbcP.gridx = 5;
         gbcP.gridy = 5;
-        gbcP.gridwidth = 10;
+        gbcP.gridwidth = 16;
         gbcP.gridheight = 2;
         gbcP.fill = GridBagConstraints.BOTH;
         gbcP.weightx = 1;
@@ -109,7 +108,7 @@ class myFrame extends JFrame {
         lbLab2 = new JLabel("Password");
         gbcP.gridx = 5;
         gbcP.gridy = 9;
-        gbcP.gridwidth = 10;
+        gbcP.gridwidth = 16;
         gbcP.gridheight = 2;
         gbcP.fill = GridBagConstraints.BOTH;
         gbcP.weightx = 1;
@@ -118,24 +117,12 @@ class myFrame extends JFrame {
         gbP.setConstraints(lbLab2, gbcP);
         pnP.add(lbLab2);
 
-        /*lbLab3 = new JLabel("JarChat");
-        gbcP.gridx = 0;
-        gbcP.gridy = 0;
-        gbcP.gridwidth = 20;
-        gbcP.gridheight = 4;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 1;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(lbLab3, gbcP);
-        pnP.add(lbLab3);*/
-
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JScrollPane scpP = new JScrollPane(pnP);
         this.setContentPane(scpP);
-        this.pack();
         this.setTitle(title+" | Login");
         this.setVisible(true);
+        this.setSize(new Dimension(320,160));
     }
 }
