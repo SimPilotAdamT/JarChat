@@ -9,9 +9,8 @@ package com.AdamT.JarChat;
 //Imports
 import java.lang.*;
 import java.util.*;
-import javafx.*;
-//import javax.swing.*;
-//import java.awt.*;
+import javax.swing.*;
+import java.awt.*;
 
 public class Server {
     //Class variables
@@ -21,17 +20,19 @@ public class Server {
         uix();
     }
     static void uix() {
-        /*try {
+        try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        new myFrame("JarChat - Server");    //Creates instance of the UI's frame*/
+        new myFrame("JarChat - Server");    //Creates instance of the UI's frame
     }
 }
 
-/*class myFrame extends JFrame {
+class myFrame extends JFrame {
     myFrame(String title) {
+        JFrame f = new JFrame(title);
+
     }
-}*/
+}
