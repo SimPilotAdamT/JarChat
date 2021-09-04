@@ -1,3 +1,5 @@
+#IDE Settings
 .idea
-out
 *.iml
+#Compier Output (only upload will be the JAR at every release)
+out
