@@ -13,18 +13,57 @@ package com.AdamT.JarChat;
 //Imports
 import java.lang.*;
 import java.util.*;
+import java.net.*;
+import java.io.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import java.awt.*;
 
 public class Client {
-    //Class variables
+    private static Scanner con;
+    private static Socket socket;
+    private static String nick;
+    private static String uname;
+    private static String name;
+    private static PrintWriter out;
+    private static Scanner in;
 
-    public static void main(String[] args) {
-        System.out.println("Hi!");
-        uix();
+    public static void main(String[] args) throws IOException {
+        System.out.println("\nHi!");
+
+        con = new Scanner(System.in);
+
+        System.out.print("\nEnter nickname: "); nick = con.nextLine();
+        System.out.print("\nEnter username: "); uname = con.nextLine();
+        System.out.print("\nEnter real name: "); name = con.nextLine();
+
+        System.out.print("\n");
+
+        socket = new Socket("irc.libera.chat",6697);
+        out = new PrintWriter(socket.getOutputStream(), true);
+        in = new Scanner(socket.getInputStream());
+
+        write("NICK", nick);
+        write("USER", uname + " 0 * :" + name);
+
+        while (in.hasNext()) {
+            System.out.println("<<<" + in.nextLine());
+        }
+
+        //uix();
+
+        in.close();
+        out.close();
+        socket.close();
+        con.close();
     }
-    static void uix() {
+    private static void write(String comm, String mess) {
+        String fullMess = comm + " " + mess;
+        System.out.println(">>> " + fullMess);
+        out.print(fullMess+"\r\n");
+        out.flush();
+    }
+    private static void uix() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
