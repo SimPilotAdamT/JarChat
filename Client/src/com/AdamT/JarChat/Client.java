@@ -21,17 +21,33 @@ import java.awt.*;
 
 public class Client {
     private static Scanner con;
+    private static String server;
+    private static String port;
+    private static boolean valid;
     private static Socket socket;
     private static String nick;
     private static String uname;
     private static String name;
-    private static PrintWriter out;
-    private static Scanner in;
+    private static BufferedWriter out;
+    private static BufferedReader in;
+    private static String line;
 
     public static void main(String[] args) throws IOException {
         System.out.println("\nHi!");
 
         con = new Scanner(System.in);
+
+        System.out.print("\nEnter server IP/Hostname: "); server = con.nextLine();
+        System.out.print("\nEnter server port: "); port = con.nextLine();
+
+        valid = false;
+        while (!valid) {
+            if (isInteger(port)) valid = true;
+            else {
+                System.out.print("\n\nError! Invalid port!\nEnter server port: ");
+                port = con.nextLine();
+            }
+        }
 
         System.out.print("\nEnter nickname: "); nick = con.nextLine();
         System.out.print("\nEnter username: "); uname = con.nextLine();
@@ -39,15 +55,21 @@ public class Client {
 
         System.out.print("\n");
 
-        socket = new Socket("irc.libera.chat",6697);
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new Scanner(socket.getInputStream());
+        socket = new Socket(server,Integer.parseInt(port));
+        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         write("NICK", nick);
         write("USER", uname + " 0 * :" + name);
 
-        while (in.hasNext()) {
-            System.out.println("<<<" + in.nextLine());
+        line = null;
+
+        while ((line = in.readLine()) != null) {
+            if (line.indexOf("004") >= 0) break;
+            else if (line.indexOf("443") >= 0) {
+                System.out.println("<<< Nickname is already in use");
+                return;
+            }
         }
 
         //uix();
@@ -57,12 +79,13 @@ public class Client {
         socket.close();
         con.close();
     }
-    private static void write(String comm, String mess) {
+    private static void write(String comm, String mess) throws IOException {
         String fullMess = comm + " " + mess;
         System.out.println(">>> " + fullMess);
-        out.print(fullMess+"\r\n");
+        out.write(fullMess+"\r\n");
         out.flush();
     }
+
     private static void uix() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -71,6 +94,17 @@ public class Client {
             e.printStackTrace();
         }
         new firstFrame("JarChat - Client");    //Creates instance of the UI's frame
+    }
+
+    private static boolean isInteger(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
 
