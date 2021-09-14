@@ -20,6 +20,7 @@ import javax.swing.border.*;
 import java.awt.*;
 
 public class Client {
+    //Class Variables
     private static Scanner con;
     private static String server;
     private static String port;
@@ -38,7 +39,7 @@ public class Client {
         con = new Scanner(System.in);
 
         System.out.print("\nEnter server IP/Hostname: "); server = con.nextLine();
-        System.out.print("\nEnter server port: "); port = con.nextLine();
+        System.out.print("Enter server port: "); port = con.nextLine();
 
         valid = false;
         while (!valid) {
@@ -50,24 +51,24 @@ public class Client {
         }
 
         System.out.print("\nEnter nickname: "); nick = con.nextLine();
-        System.out.print("\nEnter username: "); uname = con.nextLine();
-        System.out.print("\nEnter real name: "); name = con.nextLine();
+        System.out.print("Enter username: "); uname = con.nextLine();
+        System.out.print("Enter real name: "); name = con.nextLine();
 
         System.out.print("\n");
 
         socket = new Socket(server,Integer.parseInt(port));
+        socket.setSoTimeout(100000);
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         write("NICK", nick);
-        write("USER", uname + " 0 * :" + name);
+        write("USER", uname + " 8 * :" + name);
 
         line = null;
-
-        while ((line = in.readLine()) != null) {
-            if (line.indexOf("004") >= 0) break;
-            else if (line.indexOf("443") >= 0) {
-                System.out.println("<<< Nickname is already in use");
+        while ((line=in.readLine()) != null) {
+            if (line.contains("004")) break;
+            else if (line.contains("433")) {
+                System.out.println("Nickname is already in use.");
                 return;
             }
         }
@@ -79,6 +80,7 @@ public class Client {
         socket.close();
         con.close();
     }
+
     private static void write(String comm, String mess) throws IOException {
         String fullMess = comm + " " + mess;
         System.out.println(">>> " + fullMess);
