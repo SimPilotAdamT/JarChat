@@ -21,6 +21,7 @@ import java.awt.*;
 
 public class Client {
     private static BufferedWriter out;
+    private static BufferedReader in;
 
     public static void main(String[] args) throws IOException {
         System.out.println("\nHi!");
@@ -52,23 +53,41 @@ public class Client {
 
         Socket socket = new Socket(server, Integer.parseInt(port));
         socket.setSoTimeout(100000);
-        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        write("NICK", nick);
-        write("USER", uname + " 8 * : " + name);
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (Exception e) {
+            System.out.println("Error connecting...\n");
+            e.printStackTrace();
+            System.exit(1);
+        }
 
-        String line;
+        try {
+            write("NICK", nick);
+            write("USER", uname + " 8 * : " + name);
+        } catch (Exception e) {
+            System.out.println("Error connecting...\n");
+            e.printStackTrace();
+            System.exit(1);
+        }
 
-        if (in.readLine() == null) {
-            line = in.readLine();
-            while (line != null) {
-                if (line.contains("004")) break;
-                else if (line.contains("433")) {
-                    System.out.println("Nickname is already in use.");
-                    return;
+        try {
+            String line;
+            if (in.readLine() == null) {
+                line = in.readLine();
+                while (line != null) {
+                    if (line.contains("004")) break;
+                    else if (line.contains("433")) {
+                        System.out.println("Nickname is already in use.");
+                        return;
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Error connecting...\n");
+            e.printStackTrace();
+            System.exit(1);
         }
 
         //uix();
@@ -77,6 +96,8 @@ public class Client {
         out.close();
         socket.close();
         con.close();
+
+        System.exit(0);
     }
 
     private static void write(String comm, String mess) throws IOException {
@@ -102,7 +123,6 @@ public class Client {
             return true;
         }
         catch(Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
