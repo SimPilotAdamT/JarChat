@@ -20,28 +20,19 @@ import javax.swing.border.*;
 import java.awt.*;
 
 public class Client {
-    //Class Variables
-    private static Scanner con;
-    private static String server;
-    private static String port;
-    private static boolean valid;
-    private static Socket socket;
-    private static String nick;
-    private static String uname;
-    private static String name;
     private static BufferedWriter out;
-    private static BufferedReader in;
-    private static String line;
 
     public static void main(String[] args) throws IOException {
         System.out.println("\nHi!");
 
-        con = new Scanner(System.in);
+        Scanner con = new Scanner(System.in);
 
-        System.out.print("\nEnter server IP/Hostname: "); server = con.nextLine();
-        System.out.print("Enter server port: "); port = con.nextLine();
+        System.out.print("\nEnter server IP/Hostname: ");
+        String server = con.nextLine();
+        System.out.print("Enter server port: ");
+        String port = con.nextLine();
 
-        valid = false;
+        boolean valid = false;
         while (!valid) {
             if (isInteger(port)) valid = true;
             else {
@@ -50,22 +41,25 @@ public class Client {
             }
         }
 
-        System.out.print("\nEnter nickname: "); nick = con.nextLine();
-        System.out.print("Enter username: "); uname = con.nextLine();
-        System.out.print("Enter real name: "); name = con.nextLine();
+        System.out.print("\nEnter nickname: ");
+        String nick = con.nextLine();
+        System.out.print("Enter username: ");
+        String uname = con.nextLine();
+        System.out.print("Enter real name: ");
+        String name = con.nextLine();
 
         System.out.print("\n");
 
-        socket = new Socket(server,Integer.parseInt(port));
+        Socket socket = new Socket(server, Integer.parseInt(port));
         socket.setSoTimeout(100000);
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         write("NICK", nick);
         write("USER", uname + " 8 * :" + name);
 
-        line = null;
-        while ((line=in.readLine()) != null) {
+        String line = in.readLine();
+        while (line != null) {
             if (line.contains("004")) break;
             else if (line.contains("433")) {
                 System.out.println("Nickname is already in use.");
