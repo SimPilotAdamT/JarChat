@@ -56,14 +56,18 @@ public class Client {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         write("NICK", nick);
-        write("USER", uname + " 8 * :" + name);
+        write("USER", uname + " 8 * : " + name);
 
-        String line = in.readLine();
-        while (line != null) {
-            if (line.contains("004")) break;
-            else if (line.contains("433")) {
-                System.out.println("Nickname is already in use.");
-                return;
+        String line;
+
+        if (in.readLine() == null) {
+            line = in.readLine();
+            while (line != null) {
+                if (line.contains("004")) break;
+                else if (line.contains("433")) {
+                    System.out.println("Nickname is already in use.");
+                    return;
+                }
             }
         }
 
