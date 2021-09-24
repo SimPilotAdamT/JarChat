@@ -65,7 +65,7 @@ public class Client {
 
         try {
             write("NICK", nick);
-            write("USER", uname + " 8 * : " + name);
+            write("USER", uname + "8*:" + name);
         } catch (Exception e) {
             System.out.println("Error connecting...\n");
             e.printStackTrace();
@@ -73,15 +73,12 @@ public class Client {
         }
 
         try {
-            String line;
-            if (in.readLine() == null) {
-                line = in.readLine();
-                while (line != null) {
-                    if (line.contains("004")) break;
-                    else if (line.contains("433")) {
-                        System.out.println("Nickname is already in use.");
-                        return;
-                    }
+            String line = in.readLine();
+            while (line != null) {
+                if (line.contains("004")) break;
+                else if (line.contains("433")) {
+                    System.out.println("Nickname is already in use.");
+                    return;
                 }
             }
         } catch (Exception e) {
