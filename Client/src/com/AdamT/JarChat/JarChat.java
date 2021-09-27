@@ -19,6 +19,7 @@ import javax.swing.border.*;
 import java.awt.*;
 import org.kitteh.irc.client.library.*;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
+import pircbotx.*;
 
 public class JarChat {
 
@@ -50,13 +51,14 @@ public class JarChat {
 
         System.out.print("\n");
 
-        Client client = Client.builder().nick(nick).server().host(server).port(Integer.parseInt(port)).then().buildAndConnect();
+        /*Client client = Client.builder().nick(nick).server().host(server).port(Integer.parseInt(port)).then().buildAndConnect();
 
         client.getAuthManager().addProtocol(NickServ.builder(client).account(nick).password("Champions2020YNWA").build());
 
         client.addChannel("##SimPilotAdamT-TestingGround");
-        client.sendMessage("##SimPilotAdamT-TestingGround", "Hello World!");
+        client.sendMessage("##SimPilotAdamT-TestingGround", "Hello World!");*/
 
+        con.close();
         System.exit(0);
     }
 
