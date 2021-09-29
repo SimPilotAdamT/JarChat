@@ -19,7 +19,7 @@ import javax.swing.border.*;
 import java.awt.*;
 import org.kitteh.irc.client.library.*;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
-import pircbotx.*;
+import org.pircbotx.*;
 
 public class JarChat {
 
