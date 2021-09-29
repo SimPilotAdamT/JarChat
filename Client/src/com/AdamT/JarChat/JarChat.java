@@ -48,12 +48,14 @@ public class JarChat {
         String uname = con.nextLine();
         System.out.print("Enter real name: ");
         String name = con.nextLine();
+        System.out.print("Enter password: ");
+        String pass = con.nextLine();
 
         System.out.print("\n");
 
         /*Client client = Client.builder().nick(nick).server().host(server).port(Integer.parseInt(port)).then().buildAndConnect();
 
-        client.getAuthManager().addProtocol(NickServ.builder(client).account(nick).password("").build());
+        client.getAuthManager().addProtocol(NickServ.builder(client).account(nick).password(pass).build());
 
         client.addChannel("##SimPilotAdamT-TestingGround");
         client.sendMessage("##SimPilotAdamT-TestingGround", "Hello World!");*/
