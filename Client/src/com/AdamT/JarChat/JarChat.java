@@ -53,7 +53,7 @@ public class JarChat {
 
         /*Client client = Client.builder().nick(nick).server().host(server).port(Integer.parseInt(port)).then().buildAndConnect();
 
-        client.getAuthManager().addProtocol(NickServ.builder(client).account(nick).password("Champions2020YNWA").build());
+        client.getAuthManager().addProtocol(NickServ.builder(client).account(nick).password("").build());
 
         client.addChannel("##SimPilotAdamT-TestingGround");
         client.sendMessage("##SimPilotAdamT-TestingGround", "Hello World!");*/
