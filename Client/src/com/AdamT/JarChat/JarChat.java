@@ -53,6 +53,9 @@ public class JarChat {
 
         System.out.print("\n");
 
+        Configuration config = new Configuration.Builder().setName(nick).setLogin(nick).setAutoNickChange(false).addAutoJoinChannel("##SimPilotAdamT-TestingGround").buildConfiguration();
+        PircBotX user = new PircBotX(config);
+
         con.close();
         System.exit(0);
     }
