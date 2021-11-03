@@ -5,7 +5,7 @@
  * Built using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2021-09-11 14:07Z by SimPilotAdamT
+ * Last Edited: 2021-11-03 18:45Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
@@ -17,8 +17,6 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
-import org.kitteh.irc.client.library.*;
-import org.kitteh.irc.client.library.feature.auth.NickServ;
 import org.pircbotx.*;
 
 public class JarChat {
