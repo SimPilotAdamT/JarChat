@@ -45,7 +45,7 @@ public class JarChat extends IRCMessageLoop {
 
         if (msg.content.equals("!news")) {
             privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in " +
-                    "blood and guts and in living color, you are going to see another first - an attempted suicide.");
+                    "blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
         }
     }
 
