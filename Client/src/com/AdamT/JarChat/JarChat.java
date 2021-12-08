@@ -2,10 +2,10 @@
  * JarChat IRC Client Source Code
  * Free and Open-sourced under the GNU GPL v3 Licence
  *
- * Built using the latest JDK 8 to ensure compatibility with all
+ * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2021-12-08 20:32Z by SimPilotAdamT
+ * Last Edited: 2021-12-08 20:46Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
