@@ -16,8 +16,6 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-// https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772#file-simpleircclient-java
-
 public class JarChat extends IRCMessageLoop {
     JarChat(String server, int port) {
         super(server, port);
