@@ -8,4 +8,4 @@ This is ***__very__*** work in progress at the moment, and while having the help
 Issues #1 and #2 are placeholders so I can better break down what I have to do. You can ignore those...
 
 ## Credits
-@kaecy's [gist](https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772#file-simpleircclient-java) basically drives the core of the actual connection to IRC. If it wasn't for that, none of this project would be possible.
+[@kaecy](https://github.com/kaecy)'s [gist](https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772#file-simpleircclient-java) basically drives the core of the actual connection to IRC. If it wasn't for that, none of this project would be possible.
