@@ -1,8 +1,10 @@
+#GIT
+.git
 #IDE Settings
 .idea
 .run
 *.iml
 #Compier Output (only upload will be the JAR at every release)
-src/META-INF
-META-INF
-out
+Client/src/META-INF
+Client/META-INF
+Client/out
