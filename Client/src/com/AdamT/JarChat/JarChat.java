@@ -5,21 +5,51 @@
  * Built using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2021-11-03 18:45Z by SimPilotAdamT
+ * Last Edited: 2021-12-08 20:32Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
 
 //Imports
-import java.util.Scanner;
+import com.sun.istack.internal.Nullable;
+import java.util.*;
 import java.net.*;
 import java.io.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
-import org.pircbotx.*;
 
-public class JarChat {
+// https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772#file-simpleircclient-java
+
+public class JarChat extends IRCMessageLoop {
+    JarChat(String server, int port) {
+        super(server, port);
+    }
+
+    // you have full access to PRIVMSG messages that are parsed.
+    void raw(Message msg, @Nullable String nick, @Nullable String pass) {
+
+        if (msg.target.equals("NickServ")) {
+            privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
+        }
+
+        // when someone sends "hello" we'll respond with "Hiya!"
+        if (msg.content.equals("hello")) {
+            // is this a channel the message was sent to?
+            if (msg.target.startsWith("#")) {
+                privmsg(msg.target, "Hiya!");
+            } else {
+                // no it's a private message. let's send this message back to the nickname.
+                privmsg(msg.nickname, "Hiya");
+            }
+            // this is weird, yep, but this is how irc is.
+            // the target of a message is the person or group (channel) receiving the message so
+            // if the bot is receiving the message the target would be
+            // the bot's nickname.
+        }
+
+        if (msg.content.equals("!news")) {
+            privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in " +
+                    "blood and guts and in living color, you are going to see another first - an attempted suicide.");
+        }
+    }
 
     public static void main(String[] args) {
         System.out.println("\nHi!");
@@ -33,7 +63,7 @@ public class JarChat {
 
         boolean valid = false;
         while (!valid) {
-            if (isInteger(port)) valid = true;
+            if (isInteger(port)&&port.length()==4) valid = true;
             else {
                 System.out.print("\n\nError! Invalid port!\nEnter server port: ");
                 port = con.nextLine();
@@ -51,21 +81,15 @@ public class JarChat {
 
         System.out.print("\n");
 
-        Configuration config = new Configuration.Builder().setName(nick).setLogin(nick).setAutoNickChange(false).addAutoJoinChannel("##SimPilotAdamT-TestingGround").buildConfiguration();
-        PircBotX user = new PircBotX(config);
+        JarChat client = new JarChat(server, Integer.parseInt(port));
+
+        client.nick(nick);
+        client.user(uname, "null", "null", name);
+        client.join("##SimPilotAdamT-TestingGround");
+        client.run();
 
         con.close();
         System.exit(0);
-    }
-
-    private static void uix() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        new firstFrame("JarChat - Client");    //Creates instance of the UI's frame
     }
 
     private static boolean isInteger(String input) {
@@ -79,104 +103,255 @@ public class JarChat {
     }
 }
 
-class firstFrame extends JFrame {
-    JPanel pnP;
-    JTextField tfName;
-    JTextField tfPass;
-    JButton btLogIn;
-    JButton btRegBut;
-    JLabel lbLab0;
-    JLabel lbLab1;
-    firstFrame(String title) {
-        pnP = new JPanel();
-        pnP.setBorder(BorderFactory.createTitledBorder(""));
-        GridBagLayout gbP = new GridBagLayout();
-        GridBagConstraints gbcP = new GridBagConstraints();
-        pnP.setLayout(gbP);
-        pnP.setBorder(new EmptyBorder(5,5,5,5));
+abstract class IRCMessageLoop implements Runnable {
+    Socket server;
+    OutputStream out;
+    ArrayList channelList;
+    boolean initial_setup_status;
 
-        tfName = new JTextField();
-        gbcP.gridx = 5;
-        gbcP.gridy = 7;
-        gbcP.gridwidth = 16;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 0;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(tfName, gbcP);
-        pnP.add(tfName);
+    IRCMessageLoop(String serverName, int port) {
+        channelList = new ArrayList();
+        try
+        {
+            server = new Socket(serverName, port);
+            out = server.getOutputStream();
+        }
+        catch (IOException info)
+        {}
+    }
 
-        tfPass = new JTextField();
-        gbcP.gridx = 5;
-        gbcP.gridy = 11;
-        gbcP.gridwidth = 16;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 0;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(tfPass, gbcP);
-        pnP.add(tfPass);
+    void send(String text) {
+        byte[] bytes = (text + "\r\n").getBytes();
 
-        btLogIn = new JButton("Log In");
-        gbcP.gridx = 5;
-        gbcP.gridy = 14;
-        gbcP.gridwidth = 4;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 0;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(btLogIn, gbcP);
-        btLogIn.setFont(btLogIn.getFont().deriveFont(16f));
-        pnP.add(btLogIn);
+        try {
+            out.write(bytes);
+        }
+        catch (IOException info)
+        {}
+    }
 
-        btRegBut = new JButton("Register");
-        gbcP.gridx = 11;
-        gbcP.gridy = 14;
-        gbcP.gridwidth = 4;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 0;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(btRegBut, gbcP);
-        btRegBut.setFont(btRegBut.getFont().deriveFont(16f));
-        pnP.add(btRegBut);
+    void nick(String nickname) {
+        String msg = "NICK " + nickname;
+        send(msg);
+    }
 
-        lbLab0 = new JLabel("Username:");
-        gbcP.gridx = 5;
-        gbcP.gridy = 5;
-        gbcP.gridwidth = 16;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 1;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(lbLab0, gbcP);
-        lbLab0.setFont(lbLab0.getFont().deriveFont(16f));
-        pnP.add(lbLab0);
+    void user(String username, String hostname, String servername, String realname) {
+        String msg = "USER " + username + " " + hostname + " " + servername +  " :" + realname;
+        send(msg);
+    }
 
-        lbLab1 = new JLabel("Password:");
-        gbcP.gridx = 5;
-        gbcP.gridy = 9;
-        gbcP.gridwidth = 16;
-        gbcP.gridheight = 2;
-        gbcP.fill = GridBagConstraints.BOTH;
-        gbcP.weightx = 1;
-        gbcP.weighty = 1;
-        gbcP.anchor = GridBagConstraints.NORTH;
-        gbP.setConstraints(lbLab1, gbcP);
-        lbLab1.setFont(lbLab1.getFont().deriveFont(16f));
-        pnP.add(lbLab1);
+    void join(String channel) {
+        if (!initial_setup_status) {
+            channelList.add(channel);
+            return;
+        }
+        String msg = "JOIN " + channel;
+        send(msg);
+    }
 
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    void part(String channel) {
+        String msg = "PART " + channel;
+        send(msg);
+    }
 
-        this.setContentPane(pnP);
-        this.setTitle(title+" | Login");
-        this.setSize(new Dimension(320,160));
-        this.setResizable(false);
-        this.setVisible(true);
+    void privmsg(String to, String text) {
+        String msg = "PRIVMSG " + to + " :" + text;
+        send(msg);
+    }
+
+    void pong(String server) {
+        String msg = "PONG " + server;
+        send(msg);
+    }
+
+    void quit(String reason) {
+        String msg = "QUIT :Quit: " + reason;
+        send(msg);
+    }
+
+    abstract void raw(Message msg, @Nullable String nick, @Nullable String pass);
+
+    void initial_setup() {
+
+        initial_setup_status = true;
+
+        // now join the channels. you need to wait for message 001 before you join a channel.
+        for (Object channel: channelList) {
+            join((String) channel);
+        }
+
+
+    }
+
+    void processMessage(String ircMessage) {
+        Message msg = MessageParser.message(ircMessage);
+
+        if (msg.command.equals("privmsg")) {
+            String target, content;
+
+            if (msg.content.equals("\001VERSION\001")) {
+                privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");
+                return;
+            }
+            raw(msg);
+            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
+        }
+        else if (msg.command.equals("001")) {
+            initial_setup();
+            return;
+        }
+        else if (msg.command.equals("ping")) {
+            pong(msg.content);
+        }
+    }
+
+    public void run() {
+        InputStream stream = null;
+
+        try
+        {
+            stream = server.getInputStream();
+            MessageBuffer messageBuffer = new MessageBuffer();
+            byte[] buffer = new byte[512];
+            int count;
+
+            while (true) {
+                count = stream.read(buffer);
+                if (count == -1)
+                    break;
+                messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
+                while (messageBuffer.hasCompleteMessage()) {
+                    String ircMessage = messageBuffer.getNextMessage();
+
+                    System.out.println("\"" + ircMessage + "\"");
+                    processMessage(ircMessage);
+                }
+            }
+        }
+        catch (IOException info)
+        {
+            quit("error in messageLoop");
+            info.printStackTrace();
+        }
+    }
+}
+
+class Message {
+    public String origin;
+    public String nickname;
+    public String command;
+    public String target;
+    public String content;
+}
+
+class MessageBuffer {
+    String buffer;
+
+    public MessageBuffer() {
+        buffer = "";
+    }
+
+    public void append(byte[] bytes) {
+        buffer += new String(bytes);
+    }
+
+    public boolean hasCompleteMessage() {
+        if (buffer.contains("\r\n"))
+            return true;
+        else
+            return false;
+    }
+
+    public String getNextMessage() {
+        int index = buffer.indexOf("\r\n");
+        String message = "";
+
+        if (index > -1) {
+            message = buffer.substring(0, index);
+            buffer = buffer.substring(index + 2);
+        }
+
+        return message;
+    }
+
+    public static void main(String[] args) {
+
+        MessageBuffer buf = new MessageBuffer();
+        buf.append("blah\r\nblah blah\r\nblah blah oh uh".getBytes());
+
+        while (buf.hasCompleteMessage()) {
+            System.out.println("\"" + buf.getNextMessage() + "\"");
+        }
+        buf.append(" blah\r\n".getBytes());
+        while (buf.hasCompleteMessage()) {
+            System.out.println("\"" + buf.getNextMessage() + "\"");
+        }
+
+    }
+}
+
+// class only parses messages it understands. if a message is not understood
+// the origin and command are extracted and parsing halts.
+class MessageParser {
+    static Message message(String ircMessage) {
+        Message message = new Message();
+        int spIndex;
+
+        if (ircMessage.startsWith(":")) {
+            spIndex = ircMessage.indexOf(' ');
+            if (spIndex > -1) {
+                message.origin = ircMessage.substring(1, spIndex);
+                ircMessage = ircMessage.substring(spIndex + 1);
+
+                int uIndex = message.origin.indexOf('!');
+                if (uIndex > -1) {
+                    message.nickname = message.origin.substring(0, uIndex);
+                }
+            }
+        }
+        spIndex = ircMessage.indexOf(' ');
+        if (spIndex == -1) {
+            message.command = "null";
+            return message;
+        }
+
+        message.command = ircMessage.substring(0, spIndex).toLowerCase();
+        ircMessage = ircMessage.substring(spIndex + 1);
+
+        // parse privmsg params
+        if (message.command.equals("privmsg")) {
+            spIndex = ircMessage.indexOf(' ');
+            message.target = ircMessage.substring(0, spIndex);
+            ircMessage = ircMessage.substring(spIndex + 1);
+
+            if (ircMessage.startsWith(":")) {
+                message.content = ircMessage.substring(1);
+            }
+            else {
+                message.content = ircMessage;
+            }
+        }
+
+        // parse quit/join
+        if (message.command.equals("quit") || message.command.equals("join")) {
+            if (ircMessage.startsWith(":")) {
+                message.content = ircMessage.substring(1);
+            }
+            else {
+                message.content = ircMessage;
+            }
+        }
+
+        // parse ping params
+        if (message.command.equals("ping")) {
+            spIndex = ircMessage.indexOf(' ');
+            if (spIndex > -1) {
+                message.content = ircMessage.substring(0, spIndex);
+            }
+            else {
+                message.content = ircMessage;
+            }
+        }
+        return message;
     }
 }
