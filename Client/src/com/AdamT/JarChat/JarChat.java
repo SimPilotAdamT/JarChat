@@ -17,12 +17,14 @@ import java.net.*;
 import java.io.*;
 
 public class JarChat extends IRCMessageLoop {
+    static String pass;
     JarChat(String server, int port) {
         super(server, port);
     }
 
+    // This method and all comments in it are from kaecy's gist (https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772)
     // you have full access to PRIVMSG messages that are parsed.
-    void raw(Message msg, @Nullable String nick, @Nullable String pass) {
+    void raw(Message msg, @Nullable String nick) {
 
         if (msg.target.equals("NickServ")) {
             privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
@@ -51,7 +53,6 @@ public class JarChat extends IRCMessageLoop {
 
     public static void main(String[] args) {
         System.out.println("\nHi!");
-
         Scanner con = new Scanner(System.in);
 
         System.out.print("\nEnter server IP/Hostname: ");
@@ -75,16 +76,21 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("Enter real name: ");
         String name = con.nextLine();
         System.out.print("Enter password: ");
-        String pass = con.nextLine();
+        pass = con.nextLine();
 
         System.out.print("\n");
 
         JarChat client = new JarChat(server, Integer.parseInt(port));
 
-        client.nick(nick);
-        client.user(uname, "null", "null", name);
-        client.join("##SimPilotAdamT-TestingGround");
-        client.run();
+        try {
+            client.nick(nick);
+            client.user(uname, "null", "null", name);
+            client.join("##SimPilotAdamT-TestingGround");
+            client.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("\nConnection failed.");
+        }
 
         con.close();
         System.exit(0);
@@ -101,9 +107,10 @@ public class JarChat extends IRCMessageLoop {
     }
 }
 
+// All the classes below this line are taken from kaecy's gist (https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772)
 abstract class IRCMessageLoop implements Runnable {
     Socket server;
-    OutputStream out;
+    static OutputStream out;
     ArrayList channelList;
     boolean initial_setup_status;
 
@@ -118,7 +125,7 @@ abstract class IRCMessageLoop implements Runnable {
         {}
     }
 
-    void send(String text) {
+    static void send(String text) {
         byte[] bytes = (text + "\r\n").getBytes();
 
         try {
@@ -152,7 +159,7 @@ abstract class IRCMessageLoop implements Runnable {
         send(msg);
     }
 
-    void privmsg(String to, String text) {
+    static void privmsg(String to, String text) {
         String msg = "PRIVMSG " + to + " :" + text;
         send(msg);
     }
@@ -167,7 +174,7 @@ abstract class IRCMessageLoop implements Runnable {
         send(msg);
     }
 
-    abstract void raw(Message msg, @Nullable String nick, @Nullable String pass);
+    abstract void raw(Message msg, @Nullable String nick);
 
     void initial_setup() {
 
@@ -191,7 +198,7 @@ abstract class IRCMessageLoop implements Runnable {
                 privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");
                 return;
             }
-            raw(msg);
+            raw(msg,null);
             System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
         }
         else if (msg.command.equals("001")) {
