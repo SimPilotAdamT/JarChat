@@ -111,11 +111,11 @@ public class JarChat extends IRCMessageLoop {
 abstract class IRCMessageLoop implements Runnable {
     Socket server;
     static OutputStream out;
-    ArrayList channelList;
+    ArrayList<String> channelList;
     boolean initial_setup_status;
 
     IRCMessageLoop(String serverName, int port) {
-        channelList = new ArrayList();
+        channelList = new ArrayList<String>();
         try
         {
             server = new Socket(serverName, port);
@@ -279,7 +279,7 @@ class MessageBuffer {
         return message;
     }
 
-    public static void main(String[] args) {
+    public static void main() {
 
         MessageBuffer buf = new MessageBuffer();
         buf.append("blah\r\nblah blah\r\nblah blah oh uh".getBytes());
