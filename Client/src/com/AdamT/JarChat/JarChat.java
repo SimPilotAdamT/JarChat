@@ -122,7 +122,9 @@ abstract class IRCMessageLoop implements Runnable {
             out = server.getOutputStream();
         }
         catch (IOException info)
-        {}
+        {
+            info.printStackTrace();
+        }
     }
 
     static void send(String text) {
@@ -132,7 +134,9 @@ abstract class IRCMessageLoop implements Runnable {
             out.write(bytes);
         }
         catch (IOException info)
-        {}
+        {
+            info.printStackTrace();
+        }
     }
 
     void nick(String nickname) {
@@ -203,7 +207,6 @@ abstract class IRCMessageLoop implements Runnable {
         }
         else if (msg.command.equals("001")) {
             initial_setup();
-            return;
         }
         else if (msg.command.equals("ping")) {
             pong(msg.content);
@@ -261,10 +264,7 @@ class MessageBuffer {
     }
 
     public boolean hasCompleteMessage() {
-        if (buffer.contains("\r\n"))
-            return true;
-        else
-            return false;
+        return buffer.contains("\r\n");
     }
 
     public String getNextMessage() {
