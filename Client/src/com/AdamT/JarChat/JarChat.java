@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2021-12-08 20:46Z by SimPilotAdamT
+ * Last Edited: 2022-01-07 19:43Z by SimPilotAdamT
  */
 
 package com.AdamT.JarChat;
@@ -22,7 +22,7 @@ public class JarChat extends IRCMessageLoop {
         super(server, port);
     }
 
-    // This method and all comments in it are from kaecy's gist (https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772)
+    // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
     // you have full access to PRIVMSG messages that are parsed.
     void raw(Message msg, @Nullable String nick) {
 
@@ -107,7 +107,7 @@ public class JarChat extends IRCMessageLoop {
     }
 }
 
-// All the classes below this line are taken from kaecy's gist (https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772)
+// All the classes below this line are taken from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
 abstract class IRCMessageLoop implements Runnable {
     Socket server;
     static OutputStream out;
