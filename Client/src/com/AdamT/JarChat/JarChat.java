@@ -85,8 +85,8 @@ public class JarChat extends IRCMessageLoop {
         try {
             client.nick(nick);
             client.user(uname, "null", "null", name);
-            client.join("##SimPilotAdamT-TestingGround");
             client.run();
+            client.join("##SimPilotAdamT-TestingGround");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("\nConnection failed.");
@@ -116,25 +116,21 @@ abstract class IRCMessageLoop implements Runnable {
 
     IRCMessageLoop(String serverName, int port) {
         channelList = new ArrayList<String>();
-        try
-        {
+        try {
             server = new Socket(serverName, port);
             out = server.getOutputStream();
         }
-        catch (IOException info)
-        {
+        catch (IOException info) {
             info.printStackTrace();
         }
     }
 
     static void send(String text) {
         byte[] bytes = (text + "\r\n").getBytes();
-
         try {
             out.write(bytes);
         }
-        catch (IOException info)
-        {
+        catch (IOException info) {
             info.printStackTrace();
         }
     }
@@ -216,8 +212,7 @@ abstract class IRCMessageLoop implements Runnable {
     public void run() {
         InputStream stream = null;
 
-        try
-        {
+        try {
             stream = server.getInputStream();
             MessageBuffer messageBuffer = new MessageBuffer();
             byte[] buffer = new byte[512];
@@ -225,8 +220,7 @@ abstract class IRCMessageLoop implements Runnable {
 
             while (true) {
                 count = stream.read(buffer);
-                if (count == -1)
-                    break;
+                if (count == -1) break;
                 messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
                 while (messageBuffer.hasCompleteMessage()) {
                     String ircMessage = messageBuffer.getNextMessage();
@@ -236,8 +230,7 @@ abstract class IRCMessageLoop implements Runnable {
                 }
             }
         }
-        catch (IOException info)
-        {
+        catch (IOException info) {
             quit("error in messageLoop");
             info.printStackTrace();
         }
