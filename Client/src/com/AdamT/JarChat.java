@@ -8,7 +8,7 @@
  * Last Edited: 2022-01-07 19:43Z by SimPilotAdamT
  */
 
-package com.AdamT.JarChat;
+package com.AdamT;
 
 //Imports
 import com.sun.istack.internal.Nullable;
@@ -85,8 +85,8 @@ public class JarChat extends IRCMessageLoop {
         try {
             client.nick(nick);
             client.user(uname, "null", "null", name);
-            client.run();
             client.join("##SimPilotAdamT-TestingGround");
+            client.run();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("\nConnection failed.");
