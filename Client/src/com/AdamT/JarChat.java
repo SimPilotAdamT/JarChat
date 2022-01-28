@@ -5,16 +5,21 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-01-28 15:06Z by SimPilotAdamT
+ * Last Edited: 2022-01-28 15:08Z by SimPilotAdamT
  */
 
 package com.AdamT;
 
 //Imports
 import com.sun.istack.internal.Nullable;
-import java.util.*;
-import java.net.*;
-import java.io.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class JarChat extends IRCMessageLoop {
     static String pass;
