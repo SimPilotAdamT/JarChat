@@ -18,27 +18,18 @@ import java.io.*;
 
 public class JarChat extends IRCMessageLoop {
     static String pass;
-    JarChat(String server, int port) {
-        super(server, port);
-    }
+    JarChat(String server, int port) {super(server, port);}
 
     // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
     // you have full access to PRIVMSG messages that are parsed.
     void raw(Message msg, @Nullable String nick) {
 
-        if (msg.target.equals("NickServ")) {
-            privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
-        }
+        if (msg.nickname.equalsIgnoreCase("NickServ")) privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
 
         // when someone sends "hello" we'll respond with "Hiya!"
         if (msg.content.equals("hello")) {
-            // is this a channel the message was sent to?
-            if (msg.target.startsWith("#")) {
-                privmsg(msg.target, "Hiya!");
-            } else {
-                // no it's a private message. let's send this message back to the nickname.
-                privmsg(msg.nickname, "Hiya");
-            }
+            if (msg.target.startsWith("#")) privmsg(msg.target, "Hiya!"); // is this a channel the message was sent to?
+            else privmsg(msg.nickname, "Hiya"); // no it's a private message. let's send this message back to the nickname.
             // this is weird, yep, but this is how irc is.
             // the target of a message is the person or group (channel) receiving the message so
             // if the bot is receiving the message the target would be
@@ -46,8 +37,8 @@ public class JarChat extends IRCMessageLoop {
         }
 
         if (msg.content.equals("!news")) {
-            privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in " +
-                    "blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
+            if (msg.target.startsWith("#")) privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
+            else privmsg(msg.nickname, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
         }
     }
 
@@ -96,15 +87,7 @@ public class JarChat extends IRCMessageLoop {
         System.exit(0);
     }
 
-    private static boolean isInteger(String input) {
-        try {
-            Integer.parseInt(input);
-            return true;
-        }
-        catch(Exception e) {
-            return false;
-        }
-    }
+    private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
 }
 
 // All the classes below this line are taken from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
@@ -115,24 +98,18 @@ abstract class IRCMessageLoop implements Runnable {
     boolean initial_setup_status;
 
     IRCMessageLoop(String serverName, int port) {
-        channelList = new ArrayList<String>();
+        channelList = new ArrayList<>();
         try {
             server = new Socket(serverName, port);
             out = server.getOutputStream();
         }
-        catch (IOException info) {
-            info.printStackTrace();
-        }
+        catch (IOException info) {info.printStackTrace();}
     }
 
     static void send(String text) {
         byte[] bytes = (text + "\r\n").getBytes();
-        try {
-            out.write(bytes);
-        }
-        catch (IOException info) {
-            info.printStackTrace();
-        }
+        try {out.write(bytes);}
+        catch (IOException info) {info.printStackTrace();}
     }
 
     void nick(String nickname) {
@@ -181,9 +158,7 @@ abstract class IRCMessageLoop implements Runnable {
         initial_setup_status = true;
 
         // now join the channels. you need to wait for message 001 before you join a channel.
-        for (Object channel: channelList) {
-            join((String) channel);
-        }
+        for (Object channel: channelList) {join((String) channel);}
 
 
     }
@@ -201,12 +176,8 @@ abstract class IRCMessageLoop implements Runnable {
             raw(msg,null);
             System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
         }
-        else if (msg.command.equals("001")) {
-            initial_setup();
-        }
-        else if (msg.command.equals("ping")) {
-            pong(msg.content);
-        }
+        else if (msg.command.equals("001")) initial_setup();
+        else if (msg.command.equals("ping")) pong(msg.content);
     }
 
     public void run() {
@@ -248,17 +219,11 @@ class Message {
 class MessageBuffer {
     String buffer;
 
-    public MessageBuffer() {
-        buffer = "";
-    }
+    public MessageBuffer() {buffer = "";}
 
-    public void append(byte[] bytes) {
-        buffer += new String(bytes);
-    }
+    public void append(byte[] bytes) {buffer += new String(bytes);}
 
-    public boolean hasCompleteMessage() {
-        return buffer.contains("\r\n");
-    }
+    public boolean hasCompleteMessage() {return buffer.contains("\r\n");}
 
     public String getNextMessage() {
         int index = buffer.indexOf("\r\n");
@@ -277,14 +242,9 @@ class MessageBuffer {
         MessageBuffer buf = new MessageBuffer();
         buf.append("blah\r\nblah blah\r\nblah blah oh uh".getBytes());
 
-        while (buf.hasCompleteMessage()) {
-            System.out.println("\"" + buf.getNextMessage() + "\"");
-        }
+        while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
         buf.append(" blah\r\n".getBytes());
-        while (buf.hasCompleteMessage()) {
-            System.out.println("\"" + buf.getNextMessage() + "\"");
-        }
-
+        while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
     }
 }
 
@@ -302,9 +262,7 @@ class MessageParser {
                 ircMessage = ircMessage.substring(spIndex + 1);
 
                 int uIndex = message.origin.indexOf('!');
-                if (uIndex > -1) {
-                    message.nickname = message.origin.substring(0, uIndex);
-                }
+                if (uIndex > -1) message.nickname = message.origin.substring(0, uIndex);
             }
         }
         spIndex = ircMessage.indexOf(' ');
@@ -322,33 +280,21 @@ class MessageParser {
             message.target = ircMessage.substring(0, spIndex);
             ircMessage = ircMessage.substring(spIndex + 1);
 
-            if (ircMessage.startsWith(":")) {
-                message.content = ircMessage.substring(1);
-            }
-            else {
-                message.content = ircMessage;
-            }
+            if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
+            else message.content = ircMessage;
         }
 
         // parse quit/join
         if (message.command.equals("quit") || message.command.equals("join")) {
-            if (ircMessage.startsWith(":")) {
-                message.content = ircMessage.substring(1);
-            }
-            else {
-                message.content = ircMessage;
-            }
+            if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
+            else message.content = ircMessage;
         }
 
         // parse ping params
         if (message.command.equals("ping")) {
             spIndex = ircMessage.indexOf(' ');
-            if (spIndex > -1) {
-                message.content = ircMessage.substring(0, spIndex);
-            }
-            else {
-                message.content = ircMessage;
-            }
+            if (spIndex > -1) message.content = ircMessage.substring(0, spIndex);
+            else message.content = ircMessage;
         }
         return message;
     }
