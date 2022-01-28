@@ -23,6 +23,7 @@ import java.util.Scanner;
 
 public class JarChat extends IRCMessageLoop {
     static String pass;
+    static boolean exit;
     JarChat(String server, int port) {super(server, port);}
 
     // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
@@ -44,6 +45,11 @@ public class JarChat extends IRCMessageLoop {
         if (msg.content.equals("!news")) {
             if (msg.target.startsWith("#")) privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
             else privmsg(msg.nickname, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
+        }
+
+        if (msg.content.equals("!quit")) {
+            quit("Command");
+            exit = true;
         }
     }
 
@@ -78,14 +84,19 @@ public class JarChat extends IRCMessageLoop {
 
         JarChat client = new JarChat(server, Integer.parseInt(port));
 
-        try {
-            client.nick(nick);
-            client.user(uname, "null", "null", name);
-            client.join("##SimPilotAdamT-TestingGround");
-            client.run();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("\nConnection failed.");
+        client.nick(nick);
+        client.user(uname, "null", "null", name);
+        client.start();
+        client.join("##SimPilotAdamT-TestingGround");
+
+        exit = false;
+
+        while (!exit) {
+            String input = con.nextLine();
+            if (input.equalsIgnoreCase("quit")) {
+                exit = true;
+                quit("Client Terminated");
+            }
         }
 
         con.close();
@@ -96,7 +107,7 @@ public class JarChat extends IRCMessageLoop {
 }
 
 // All the classes below this line are taken from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
-abstract class IRCMessageLoop implements Runnable {
+abstract class IRCMessageLoop extends Thread {
     Socket server;
     static OutputStream out;
     ArrayList<String> channelList;
@@ -129,7 +140,7 @@ abstract class IRCMessageLoop implements Runnable {
 
     void pong(String server) {String msg = "PONG " + server;send(msg);}
 
-    void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
+    static void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
 
     abstract void raw(Message msg, @Nullable String nick);
 
