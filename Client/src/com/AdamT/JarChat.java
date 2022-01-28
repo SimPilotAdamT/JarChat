@@ -112,55 +112,26 @@ abstract class IRCMessageLoop implements Runnable {
         catch (IOException info) {info.printStackTrace();}
     }
 
-    void nick(String nickname) {
-        String msg = "NICK " + nickname;
-        send(msg);
-    }
+    void nick(String nickname) {String msg = "NICK " + nickname;send(msg);}
 
-    void user(String username, String hostname, String servername, String realname) {
-        String msg = "USER " + username + " " + hostname + " " + servername +  " :" + realname;
-        send(msg);
-    }
+    void user(String username, String hostname, String servername, String realname) {String msg = "USER " + username + " " + hostname + " " + servername +  " :" + realname;send(msg);}
 
-    void join(String channel) {
-        if (!initial_setup_status) {
-            channelList.add(channel);
-            return;
-        }
-        String msg = "JOIN " + channel;
-        send(msg);
-    }
+    void join(String channel) {if (!initial_setup_status) {channelList.add(channel);return;}String msg = "JOIN " + channel;send(msg);}
 
-    void part(String channel) {
-        String msg = "PART " + channel;
-        send(msg);
-    }
+    void part(String channel) {String msg = "PART " + channel;send(msg);}
 
-    static void privmsg(String to, String text) {
-        String msg = "PRIVMSG " + to + " :" + text;
-        send(msg);
-    }
+    static void privmsg(String to, String text) {String msg = "PRIVMSG " + to + " :" + text;send(msg);}
 
-    void pong(String server) {
-        String msg = "PONG " + server;
-        send(msg);
-    }
+    void pong(String server) {String msg = "PONG " + server;send(msg);}
 
-    void quit(String reason) {
-        String msg = "QUIT :Quit: " + reason;
-        send(msg);
-    }
+    void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
 
     abstract void raw(Message msg, @Nullable String nick);
 
     void initial_setup() {
-
         initial_setup_status = true;
-
         // now join the channels. you need to wait for message 001 before you join a channel.
         for (Object channel: channelList) {join((String) channel);}
-
-
     }
 
     void processMessage(String ircMessage) {
@@ -169,10 +140,7 @@ abstract class IRCMessageLoop implements Runnable {
         if (msg.command.equals("privmsg")) {
             String target, content;
 
-            if (msg.content.equals("\001VERSION\001")) {
-                privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");
-                return;
-            }
+            if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}
             raw(msg,null);
             System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
         }
@@ -201,10 +169,7 @@ abstract class IRCMessageLoop implements Runnable {
                 }
             }
         }
-        catch (IOException info) {
-            quit("error in messageLoop");
-            info.printStackTrace();
-        }
+        catch (IOException info) {quit("error in messageLoop");info.printStackTrace();}
     }
 }
 
@@ -229,10 +194,7 @@ class MessageBuffer {
         int index = buffer.indexOf("\r\n");
         String message = "";
 
-        if (index > -1) {
-            message = buffer.substring(0, index);
-            buffer = buffer.substring(index + 2);
-        }
+        if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}
 
         return message;
     }
@@ -266,10 +228,7 @@ class MessageParser {
             }
         }
         spIndex = ircMessage.indexOf(' ');
-        if (spIndex == -1) {
-            message.command = "null";
-            return message;
-        }
+        if (spIndex == -1) {message.command = "null";return message;}
 
         message.command = ircMessage.substring(0, spIndex).toLowerCase();
         ircMessage = ircMessage.substring(spIndex + 1);
