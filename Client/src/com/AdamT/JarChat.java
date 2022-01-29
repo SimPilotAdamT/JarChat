@@ -62,14 +62,7 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("Enter server port: ");
         String port = con.nextLine();
 
-        boolean valid = false;
-        while (!valid) {
-            if (isInteger(port)&&port.length()==4) valid = true;
-            else {
-                System.out.print("\n\nError! Invalid port!\nEnter server port: ");
-                port = con.nextLine();
-            }
-        }
+        boolean valid = false;while (!valid) {if (isInteger(port)&&port.length()==4) valid = true;else {System.out.print("\n\nError! Invalid port!\nEnter server port: ");port = con.nextLine();}}
 
         System.out.print("\nEnter nickname: ");
         String nick = con.nextLine();
@@ -91,13 +84,7 @@ public class JarChat extends IRCMessageLoop {
 
         exit = false;
 
-        while (!exit) {
-            String input = con.nextLine();
-            if (input.equalsIgnoreCase("quit")) {
-                exit = true;
-                quit("Client Terminated");
-            }
-        }
+        while (!exit) {String input = con.nextLine();if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");}}
 
         con.close();
         System.exit(0);
