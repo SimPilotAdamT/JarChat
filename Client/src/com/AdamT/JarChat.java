@@ -84,7 +84,11 @@ public class JarChat extends IRCMessageLoop {
 
         exit = false;
 
-        while (!exit) {String input = con.nextLine();if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");}}
+        while (!exit) {
+            String input = con.nextLine();
+            if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");}
+            else privmsg("##SimPilotAdamT-TestingGround",input);
+        }
 
         con.close();
         System.exit(0);
@@ -139,10 +143,7 @@ abstract class IRCMessageLoop extends Thread {
 
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
-
         if (msg.command.equals("privmsg")) {
-            String target, content;
-
             if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}
             raw(msg,null);
             System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
@@ -152,14 +153,12 @@ abstract class IRCMessageLoop extends Thread {
     }
 
     public void run() {
-        InputStream stream = null;
-
+        InputStream stream;
         try {
             stream = server.getInputStream();
             MessageBuffer messageBuffer = new MessageBuffer();
             byte[] buffer = new byte[512];
             int count;
-
             while (true) {
                 count = stream.read(buffer);
                 if (count == -1) break;
