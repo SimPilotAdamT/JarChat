@@ -25,7 +25,6 @@ public class JarChat extends IRCMessageLoop {
     static String pass;
     static boolean exit;
     JarChat(String server, int port) {super(server, port);}
-
     // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
     // you have full access to PRIVMSG messages that are parsed.
     void raw(Message msg, @Nullable String nick) {
@@ -52,18 +51,14 @@ public class JarChat extends IRCMessageLoop {
             exit = true;
         }
     }
-
     public static void main(String[] args) {
         System.out.println("\nHi!");
         Scanner con = new Scanner(System.in);
-
         System.out.print("\nEnter server IP/Hostname: ");
         String server = con.nextLine();
         System.out.print("Enter server port: ");
         String port = con.nextLine();
-
         boolean valid = false;while (!valid) {if (isInteger(port)&&port.length()==4) valid = true;else {System.out.print("\n\nError! Invalid port!\nEnter server port: ");port = con.nextLine();}}
-
         System.out.print("\nEnter nickname: ");
         String nick = con.nextLine();
         System.out.print("Enter username: ");
@@ -72,28 +67,17 @@ public class JarChat extends IRCMessageLoop {
         String name = con.nextLine();
         System.out.print("Enter password: ");
         pass = con.nextLine();
-
         System.out.print("\n");
-
         JarChat client = new JarChat(server, Integer.parseInt(port));
-
         client.nick(nick);
         client.user(uname, "null", "null", name);
         client.start();
         client.join("##SimPilotAdamT-TestingGround");
-
         exit = false;
-
-        while (!exit) {
-            String input = con.nextLine();
-            if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");}
-            else privmsg("##SimPilotAdamT-TestingGround",input);
-        }
-
+        while (!exit) {String input = con.nextLine();if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");} else privmsg("##SimPilotAdamT-TestingGround",input);}
         con.close();
         System.exit(0);
     }
-
     private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
 }
 
@@ -104,20 +88,9 @@ abstract class IRCMessageLoop extends Thread {
     ArrayList<String> channelList;
     boolean initial_setup_status;
 
-    IRCMessageLoop(String serverName, int port) {
-        channelList = new ArrayList<>();
-        try {
-            server = new Socket(serverName, port);
-            out = server.getOutputStream();
-        }
-        catch (IOException info) {info.printStackTrace();}
-    }
+    IRCMessageLoop(String serverName, int port) {channelList = new ArrayList<>();try {server = new Socket(serverName, port);out = server.getOutputStream();} catch (IOException info) {info.printStackTrace();}}
 
-    static void send(String text) {
-        byte[] bytes = (text + "\r\n").getBytes();
-        try {out.write(bytes);}
-        catch (IOException info) {info.printStackTrace();}
-    }
+    static void send(String text) {byte[] bytes = (text + "\r\n").getBytes();try {out.write(bytes);} catch (IOException info) {info.printStackTrace();}}
 
     void nick(String nickname) {String msg = "NICK " + nickname;send(msg);}
 
@@ -135,21 +108,19 @@ abstract class IRCMessageLoop extends Thread {
 
     abstract void raw(Message msg, @Nullable String nick);
 
-    void initial_setup() {
-        initial_setup_status = true;
-        // now join the channels. you need to wait for message 001 before you join a channel.
-        for (Object channel: channelList) {join((String) channel);}
-    }
+    void initial_setup() {initial_setup_status = true;for (Object channel: channelList) {join((String) channel);}} // now join the channels. you need to wait for message 001 before you join a channel.
 
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
-        if (msg.command.equals("privmsg")) {
-            if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}
-            raw(msg,null);
-            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
+        switch (msg.command) {
+            case "privmsg":
+                if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}
+                raw(msg, null);
+                System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
+                break;
+            case "001": initial_setup();break;
+            case "ping": pong(msg.content);break;
         }
-        else if (msg.command.equals("001")) initial_setup();
-        else if (msg.command.equals("ping")) pong(msg.content);
     }
 
     public void run() {
@@ -163,100 +134,42 @@ abstract class IRCMessageLoop extends Thread {
                 count = stream.read(buffer);
                 if (count == -1) break;
                 messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
-                while (messageBuffer.hasCompleteMessage()) {
-                    String ircMessage = messageBuffer.getNextMessage();
-
-                    System.out.println("\"" + ircMessage + "\"");
-                    processMessage(ircMessage);
-                }
+                while (messageBuffer.hasCompleteMessage()) {String ircMessage = messageBuffer.getNextMessage();System.out.println("\"" + ircMessage + "\"");processMessage(ircMessage);}
             }
         }
         catch (IOException info) {quit("error in messageLoop");info.printStackTrace();}
     }
 }
 
-class Message {
-    public String origin;
-    public String nickname;
-    public String command;
-    public String target;
-    public String content;
-}
+class Message {public String origin;public String nickname;public String command;public String target;public String content;}
 
 class MessageBuffer {
     String buffer;
-
     public MessageBuffer() {buffer = "";}
-
     public void append(byte[] bytes) {buffer += new String(bytes);}
-
     public boolean hasCompleteMessage() {return buffer.contains("\r\n");}
-
-    public String getNextMessage() {
-        int index = buffer.indexOf("\r\n");
-        String message = "";
-
-        if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}
-
-        return message;
-    }
-
-    public static void main() {
-
+    public String getNextMessage() {int index = buffer.indexOf("\r\n");String message = "";if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}return message;}
+    /*public static void main() {
         MessageBuffer buf = new MessageBuffer();
         buf.append("blah\r\nblah blah\r\nblah blah oh uh".getBytes());
-
         while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
         buf.append(" blah\r\n".getBytes());
         while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
-    }
+    }*/
 }
 
 // class only parses messages it understands. if a message is not understood
 // the origin and command are extracted and parsing halts.
 class MessageParser {
     static Message message(String ircMessage) {
-        Message message = new Message();
-        int spIndex;
-
-        if (ircMessage.startsWith(":")) {
-            spIndex = ircMessage.indexOf(' ');
-            if (spIndex > -1) {
-                message.origin = ircMessage.substring(1, spIndex);
-                ircMessage = ircMessage.substring(spIndex + 1);
-
-                int uIndex = message.origin.indexOf('!');
-                if (uIndex > -1) message.nickname = message.origin.substring(0, uIndex);
-            }
-        }
-        spIndex = ircMessage.indexOf(' ');
-        if (spIndex == -1) {message.command = "null";return message;}
-
-        message.command = ircMessage.substring(0, spIndex).toLowerCase();
-        ircMessage = ircMessage.substring(spIndex + 1);
-
+        Message message = new Message();int spIndex;
+        if (ircMessage.startsWith(":")) {spIndex = ircMessage.indexOf(' ');if (spIndex > -1) {message.origin = ircMessage.substring(1, spIndex);ircMessage = ircMessage.substring(spIndex + 1);int uIndex = message.origin.indexOf('!');if (uIndex > -1) message.nickname = message.origin.substring(0, uIndex);}}spIndex = ircMessage.indexOf(' ');
+        if (spIndex == -1) {message.command = "null";return message;}message.command = ircMessage.substring(0, spIndex).toLowerCase();ircMessage = ircMessage.substring(spIndex + 1);
         // parse privmsg params
-        if (message.command.equals("privmsg")) {
-            spIndex = ircMessage.indexOf(' ');
-            message.target = ircMessage.substring(0, spIndex);
-            ircMessage = ircMessage.substring(spIndex + 1);
-
-            if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
-            else message.content = ircMessage;
-        }
-
+        if (message.command.equals("privmsg")) {spIndex = ircMessage.indexOf(' ');message.target = ircMessage.substring(0, spIndex);ircMessage = ircMessage.substring(spIndex + 1);if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);else message.content = ircMessage;}
         // parse quit/join
-        if (message.command.equals("quit") || message.command.equals("join")) {
-            if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
-            else message.content = ircMessage;
-        }
-
+        if (message.command.equals("quit") || message.command.equals("join")) {if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);else message.content = ircMessage;}
         // parse ping params
-        if (message.command.equals("ping")) {
-            spIndex = ircMessage.indexOf(' ');
-            if (spIndex > -1) message.content = ircMessage.substring(0, spIndex);
-            else message.content = ircMessage;
-        }
-        return message;
+        if (message.command.equals("ping")) {spIndex = ircMessage.indexOf(' ');if (spIndex > -1) message.content = ircMessage.substring(0, spIndex);else message.content = ircMessage;}return message;
     }
 }
