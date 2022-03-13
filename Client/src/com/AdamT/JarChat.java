@@ -113,11 +113,7 @@ abstract class IRCMessageLoop extends Thread {
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
-            case "privmsg":
-                if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}
-                raw(msg, null);
-                System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);
-                break;
+            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
             case "001": initial_setup();break;
             case "ping": pong(msg.content);break;
         }
@@ -131,8 +127,7 @@ abstract class IRCMessageLoop extends Thread {
             byte[] buffer = new byte[512];
             int count;
             while (true) {
-                count = stream.read(buffer);
-                if (count == -1) break;
+                count = stream.read(buffer);if (count == -1) break;
                 messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
                 while (messageBuffer.hasCompleteMessage()) {String ircMessage = messageBuffer.getNextMessage();System.out.println("\"" + ircMessage + "\"");processMessage(ircMessage);}
             }
