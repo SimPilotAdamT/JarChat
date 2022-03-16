@@ -58,8 +58,7 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("\nEnter nickname: ");String nick = con.nextLine();System.out.print("Enter username: ");String uname = con.nextLine();System.out.print("Enter real name: ");String name = con.nextLine();System.out.print("Enter password: ");pass = con.nextLine();
         System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();client.join("##SimPilotAdamT-TestingGround");
         exit = false;while (!exit) {String input = con.nextLine();if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");} else privmsg("##SimPilotAdamT-TestingGround",input);}
-        con.close();
-        System.exit(0);
+        con.close();System.exit(0);
     }
     private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
 }
