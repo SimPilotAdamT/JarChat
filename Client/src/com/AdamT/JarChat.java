@@ -26,10 +26,12 @@ public class JarChat extends IRCMessageLoop {
     static boolean exit;
     JarChat(String server, int port) {super(server, port);}
     // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
-    // you have full access to PRIVMSG messages that are parsed.
+    // Its contents are commented out because it is required to be in the JarChat class, but isn't actually used to parse any messages,
+    // since this is a client for IRC and not a bot.
+    // You have full access to PRIVMSG messages that are parsed.
     void raw(Message msg, @Nullable String nick) {
 
-        if (msg.nickname.equalsIgnoreCase("NickServ")) privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
+        /*if (msg.nickname.equalsIgnoreCase("NickServ")) privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
 
         // when someone sends "hello" we'll respond with "Hiya!"
         if (msg.content.equals("hello")) {
@@ -49,15 +51,23 @@ public class JarChat extends IRCMessageLoop {
         if (msg.content.equals("!quit")) {
             quit("Command");
             exit = true;
-        }
+        }*/
     }
     public static void main(String[] args) {
         System.out.println("\nHi!");
-        Scanner con = new Scanner(System.in);System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
+        Scanner con = new Scanner(System.in);
+        System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
         boolean valid = false;while (!valid) {if (isInteger(port)&&port.length()==4) valid = true;else {System.out.print("\n\nError! Invalid port!\nEnter server port: ");port = con.nextLine();}}
         System.out.print("\nEnter nickname: ");String nick = con.nextLine();System.out.print("Enter username: ");String uname = con.nextLine();System.out.print("Enter real name: ");String name = con.nextLine();System.out.print("Enter password: ");pass = con.nextLine();
         System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();client.join("##SimPilotAdamT-TestingGround");
-        exit = false;while (!exit) {String input = con.nextLine();if (input.equalsIgnoreCase("quit")) {exit = true;quit("Client Terminated");} else privmsg("##SimPilotAdamT-TestingGround",input);}
+        exit = false;
+        while (!exit) {
+            String input = con.nextLine();
+            if (input.equalsIgnoreCase("quit")) {
+                exit = true;
+                quit("Client Terminated");
+            } else privmsg("##SimPilotAdamT-TestingGround",input);
+        }
         con.close();System.exit(0);
     }
     private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
@@ -95,7 +105,7 @@ abstract class IRCMessageLoop extends Thread {
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
-            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "Prototype IRC Client (Built to learn)");return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
+            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "JarChat");return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
             case "001": initial_setup();break;
             case "ping": pong(msg.content);break;
         }
