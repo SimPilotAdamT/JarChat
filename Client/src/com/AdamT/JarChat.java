@@ -66,7 +66,7 @@ public class JarChat extends IRCMessageLoop {
             if (input.equalsIgnoreCase("quit")) {
                 exit = true;
                 quit("Client Terminated");
-            } else privmsg("##SimPilotAdamT-TestingGround",input);
+            } else privmsg("##SimPilotAdamT-TestingGround",input,nick);
         }
         con.close();System.exit(0);
     }
@@ -92,7 +92,7 @@ abstract class IRCMessageLoop extends Thread {
 
     void part(String channel) {String msg = "PART " + channel;send(msg);}
 
-    static void privmsg(String to, String text) {String msg = "PRIVMSG " + to + " :" + text;send(msg);}
+    static void privmsg(String to, String text, @Nullable String from) {String msg = "PRIVMSG " + to + " :" + text;send(msg);System.out.println("PRIVMSG: " + from + ": " + text);}
 
     void pong(String server) {String msg = "PONG " + server;send(msg);}
 
@@ -105,7 +105,7 @@ abstract class IRCMessageLoop extends Thread {
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
-            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "JarChat");return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
+            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "JarChat",null);return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
             case "001": initial_setup();break;
             case "ping": pong(msg.content);break;
         }
