@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-01-31 19:14Z by SimPilotAdamT
+ * Last Edited: 2022-04-29 17:45Z by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -29,22 +29,17 @@ public class JarChat extends IRCMessageLoop {
     JarChat(String server, int port) {super(server, port);}
     public static void main(String[] args) {
         System.out.println("\nHi!");
-        Scanner con = new Scanner(System.in);
+        Scanner con=new Scanner(System.in);
         System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
-        boolean valid = false;while (!valid) {if (isInteger(port)&&port.length()==4) valid = true;else {System.out.print("\n\nError! Invalid port!\nEnter server port: ");port = con.nextLine();}}
-        System.out.print("\nEnter nickname: ");String nick = con.nextLine();System.out.print("Enter username: ");String uname = con.nextLine();System.out.print("Enter real name: ");String name = con.nextLine();System.out.print("Enter password: ");pass = con.nextLine();
-        System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();
+        boolean valid=false;while(!valid){if(isInteger(port)&&port.length()==4)valid=true;else{System.out.print("\n\nError! Invalid port!\nEnter server port: ");port=con.nextLine();}}
+        System.out.print("\nEnter nickname: ");String nick=con.nextLine();System.out.print("Enter username: ");String uname=con.nextLine();System.out.print("Enter real name: ");String name=con.nextLine();System.out.print("Enter password: ");pass=con.nextLine();
+        System.out.print("\n");JarChat client=new JarChat(server,Integer.parseInt(port));client.nick(nick);client.user(uname,"null","null",name);client.start();
         exit = false;
         while (!exit) {
             input = con.nextLine();
-            if (input.equalsIgnoreCase("/quit")) {
-                exit = true;
-                quit("JarChat Client Terminated");
-            } else if (input.startsWith("/join ")) {
-                if (!channel.isEmpty()) client.part(channel);
-                channel=input.substring(6);
-                client.join(channel);
-            } else if (input.equalsIgnoreCase("/leave")) client.part(channel);
+            if (input.equalsIgnoreCase("/quit")) {exit = true;quit("JarChat Client Terminated");}
+            else if (input.startsWith("/join ")) {if (!channel.isEmpty()) client.part(channel);channel=input.substring(6);client.join(channel);}
+            else if (input.equalsIgnoreCase("/leave")) client.part(channel);
             else if (input.startsWith("/msg ")) privmsg(input.substring(5,input.indexOf(" ")),input.substring(input.indexOf(" ")+1),nick);
             else if (!channel.isEmpty()) privmsg(channel,input,nick);
         }
