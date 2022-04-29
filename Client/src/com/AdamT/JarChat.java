@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class JarChat extends IRCMessageLoop {
-    static String pass;
     static boolean exit;
     static String input;
     static String channel;
@@ -32,7 +31,7 @@ public class JarChat extends IRCMessageLoop {
         Scanner con=new Scanner(System.in);
         System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
         boolean valid=false;while(!valid){if(isInteger(port)&&port.length()==4)valid=true;else{System.out.print("\n\nError! Invalid port!\nEnter server port: ");port=con.nextLine();}}
-        System.out.print("\nEnter nickname: ");String nick=con.nextLine();System.out.print("Enter username: ");String uname=con.nextLine();System.out.print("Enter real name: ");String name=con.nextLine();System.out.print("Enter password: ");pass=con.nextLine();
+        System.out.print("\nEnter nickname: ");String nick=con.nextLine();System.out.print("Enter username: ");String uname=con.nextLine();System.out.print("Enter real name: ");String name=con.nextLine();
         System.out.print("\n");JarChat client=new JarChat(server,Integer.parseInt(port));client.nick(nick);client.user(uname,"null","null",name);client.start();
         exit = false;
         while (!exit) {
