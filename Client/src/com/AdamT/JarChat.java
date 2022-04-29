@@ -40,11 +40,11 @@ public class JarChat extends IRCMessageLoop {
                 exit = true;
                 quit("Client Terminated");
             } else if (input.startsWith("/join")) {
-                if (!channel.equalsIgnoreCase(null)) client.part(channel);
+                if (!channel.isEmpty()) client.part(channel);
                 channel=input.substring(5);
                 client.join(channel);
             } else if (input.equalsIgnoreCase("/leave")) client.part(channel);
-            else if (!channel.equalsIgnoreCase(null)) privmsg(channel,input,nick);
+            else if (!channel.isEmpty()) privmsg(channel,input,nick);
         }
         con.close();System.exit(0);
     }
