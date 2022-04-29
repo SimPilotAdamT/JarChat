@@ -24,49 +24,27 @@ import java.util.Scanner;
 public class JarChat extends IRCMessageLoop {
     static String pass;
     static boolean exit;
+    static String channel;
     JarChat(String server, int port) {super(server, port);}
-    // This method and all comments in it are from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
-    // Its contents are commented out because it is required to be in the JarChat class, but isn't actually used to parse any messages,
-    // since this is a client for IRC and not a bot.
-    // You have full access to PRIVMSG messages that are parsed.
-    void raw(Message msg, @Nullable String nick) {
-
-        /*if (msg.nickname.equalsIgnoreCase("NickServ")) privmsg(msg.nickname, "IDENTIFY " + nick + " " + pass);
-
-        // when someone sends "hello" we'll respond with "Hiya!"
-        if (msg.content.equals("hello")) {
-            if (msg.target.startsWith("#")) privmsg(msg.target, "Hiya!"); // is this a channel the message was sent to?
-            else privmsg(msg.nickname, "Hiya"); // no it's a private message. let's send this message back to the nickname.
-            // this is weird, yep, but this is how irc is.
-            // the target of a message is the person or group (channel) receiving the message so
-            // if the bot is receiving the message the target would be
-            // the bot's nickname.
-        }
-
-        if (msg.content.equals("!news")) {
-            if (msg.target.startsWith("#")) privmsg(msg.target, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
-            else privmsg(msg.nickname, "In keeping with Channel 40's policy of bringing you the latest in blood and guts and in living color, you are going to see another first - an attempted suicide in Stockholm.");
-        }
-
-        if (msg.content.equals("!quit")) {
-            quit("Command");
-            exit = true;
-        }*/
-    }
     public static void main(String[] args) {
         System.out.println("\nHi!");
         Scanner con = new Scanner(System.in);
         System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
         boolean valid = false;while (!valid) {if (isInteger(port)&&port.length()==4) valid = true;else {System.out.print("\n\nError! Invalid port!\nEnter server port: ");port = con.nextLine();}}
         System.out.print("\nEnter nickname: ");String nick = con.nextLine();System.out.print("Enter username: ");String uname = con.nextLine();System.out.print("Enter real name: ");String name = con.nextLine();System.out.print("Enter password: ");pass = con.nextLine();
-        System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();client.join("##SimPilotAdamT-TestingGround");
+        System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();
         exit = false;
         while (!exit) {
             String input = con.nextLine();
-            if (input.equalsIgnoreCase("quit")) {
+            if (input.equalsIgnoreCase("/quit")) {
                 exit = true;
                 quit("Client Terminated");
-            } else privmsg("##SimPilotAdamT-TestingGround",input,nick);
+            } else if (input.startsWith("/join")) {
+                if (!channel.equalsIgnoreCase(null)) client.part(channel);
+                channel=input.substring(5);
+                client.join(channel);
+            } else if (input.equalsIgnoreCase("/leave")) client.part(channel);
+            else if (!channel.equalsIgnoreCase(null)) privmsg(channel,input,nick);
         }
         con.close();System.exit(0);
     }
@@ -98,14 +76,12 @@ abstract class IRCMessageLoop extends Thread {
 
     static void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
 
-    abstract void raw(Message msg, @Nullable String nick);
-
     void initial_setup() {initial_setup_status = true;for (Object channel: channelList) {join((String) channel);}} // now join the channels. you need to wait for message 001 before you join a channel.
 
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
-            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "JarChat",null);return;}raw(msg, null);System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
+            case "privmsg": if (msg.content.equals("\001VERSION\001")) {privmsg(msg.nickname, "JarChat",null);return;}System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
             case "001": initial_setup();break;
             case "ping": pong(msg.content);break;
         }
