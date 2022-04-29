@@ -24,6 +24,7 @@ import java.util.Scanner;
 public class JarChat extends IRCMessageLoop {
     static String pass;
     static boolean exit;
+    static String input;
     static String channel;
     JarChat(String server, int port) {super(server, port);}
     public static void main(String[] args) {
@@ -35,15 +36,16 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("\n");JarChat client = new JarChat(server, Integer.parseInt(port));client.nick(nick);client.user(uname, "null", "null", name);client.start();
         exit = false;
         while (!exit) {
-            String input = con.nextLine();
+            input = con.nextLine();
             if (input.equalsIgnoreCase("/quit")) {
                 exit = true;
-                quit("Client Terminated");
-            } else if (input.startsWith("/join")) {
+                quit("JarChat Client Terminated");
+            } else if (input.startsWith("/join ")) {
                 if (!channel.isEmpty()) client.part(channel);
-                channel=input.substring(5);
+                channel=input.substring(6);
                 client.join(channel);
             } else if (input.equalsIgnoreCase("/leave")) client.part(channel);
+            else if (input.startsWith("/msg ")) privmsg(input.substring(5,input.indexOf(" ")),input.substring(input.indexOf(" ")+1),nick);
             else if (!channel.isEmpty()) privmsg(channel,input,nick);
         }
         con.close();System.exit(0);
@@ -106,20 +108,7 @@ abstract class IRCMessageLoop extends Thread {
 
 class Message {public String origin;public String nickname;public String command;public String target;public String content;}
 
-class MessageBuffer {
-    String buffer;
-    public MessageBuffer() {buffer = "";}
-    public void append(byte[] bytes) {buffer += new String(bytes);}
-    public boolean hasCompleteMessage() {return buffer.contains("\r\n");}
-    public String getNextMessage() {int index = buffer.indexOf("\r\n");String message = "";if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}return message;}
-    /*public static void main() {
-        MessageBuffer buf = new MessageBuffer();
-        buf.append("blah\r\nblah blah\r\nblah blah oh uh".getBytes());
-        while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
-        buf.append(" blah\r\n".getBytes());
-        while (buf.hasCompleteMessage()) {System.out.println("\"" + buf.getNextMessage() + "\"");}
-    }*/
-}
+class MessageBuffer {String buffer;public MessageBuffer() {buffer = "";}public void append(byte[] bytes) {buffer += new String(bytes);}public boolean hasCompleteMessage() {return buffer.contains("\r\n");}public String getNextMessage() {int index = buffer.indexOf("\r\n");String message = "";if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}return message;}}
 
 // class only parses messages it understands. if a message is not understood
 // the origin and command are extracted and parsing halts.
