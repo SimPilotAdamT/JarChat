@@ -37,11 +37,18 @@ public class JarChat extends IRCMessageLoop {
         exit = false;
         while (!exit) {
             input = con.nextLine();
-            if(input.equalsIgnoreCase("/quit")){exit=true;quit("JarChat Client Terminated");}
-            else if(input.startsWith("/join ")){if(!channel.isEmpty())client.part(channel);channel=input.substring(6);client.join(channel);}
-            else if(input.equalsIgnoreCase("/leave"))client.part(channel);
-            else if(input.startsWith("/msg "))privmsg(input.substring(5,input.indexOf(" ")),input.substring(input.indexOf(" ")+1),nick);
-            else if(!channel.isEmpty())privmsg(channel,input,nick);
+            if (input.equalsIgnoreCase("/quit")) {
+                exit=true;
+                quit("JarChat Client Terminated");
+            }
+            else if (input.startsWith("/join ")){
+                if(!channel.isEmpty()) client.part(channel);
+                channel=input.substring(6);
+                client.join(channel);
+            }
+            else if (input.equalsIgnoreCase("/leave")) client.part(channel);
+            else if (input.startsWith("/msg ")) privmsg(input.substring(5,input.indexOf(" ")),input.substring(input.indexOf(" ")+1),nick);
+            else if (!channel.isEmpty()) privmsg(channel,input,nick);
         }
         con.close();System.exit(0);
     }
