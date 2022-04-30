@@ -4,7 +4,10 @@
 .idea
 .run
 *.iml
-#Compier Output (only upload will be the JAR at every release)
+#Compiler Output (only upload will be the JAR at every release)
 Client/src/META-INF
 Client/META-INF
 Client/out
+META-INF
+out
+src/META-INF
