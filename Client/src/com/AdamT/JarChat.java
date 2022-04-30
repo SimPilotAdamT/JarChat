@@ -5,14 +5,13 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-04-29 17:45Z by SimPilotAdamT
+ * Last Edited: 2022-04-30 13:23Z by SimPilotAdamT
  */
 
 package com.AdamT;
 
 //Imports
 import com.sun.istack.internal.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,11 +55,7 @@ public class JarChat extends IRCMessageLoop {
 
         client = new JarChat(server, Integer.parseInt(port));
         client.nick(nick);
-        try {
-            client.user(uname, InetAddress.getLocalHost().getHostName(), name);
-        } catch (UnknownHostException e) {
-            client.user(uname, "null", name);
-        }
+        try {client.user(uname, InetAddress.getLocalHost().getHostName(), name);} catch (UnknownHostException e) {client.user(uname, "null", name);}
         client.start();
         exit = false;
         while (!exit) {
@@ -70,15 +65,20 @@ public class JarChat extends IRCMessageLoop {
                 quit("JarChat Client Terminated");
             }
             else if (input.startsWith("/join ")){
-                if(!channel.isEmpty()) client.part(channel);
+                if (!channel.isEmpty()) client.part(channel);
                 channel=input.substring(6);
                 client.join(channel);
             }
-            else if (input.equalsIgnoreCase("/leave")) client.part(channel);
-            else if (input.startsWith("/msg ")) privmsg(input.substring(5,input.indexOf(" ")),input.substring(input.indexOf(" ")+1),nick);
+            else if (input.equalsIgnoreCase("/leave") && !channel.isEmpty()) client.part(channel);
+            else if (input.startsWith("/msg ")) {
+                input = input.substring(5);
+                String[] message = input.split(" ",2);
+                privmsg(message[0],message[1],nick);
+            }
             else if (!channel.isEmpty()) privmsg(channel,input,nick);
         }
-        con.close();System.exit(0);
+        con.close();
+        System.exit(0);
     }
     private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
 }
