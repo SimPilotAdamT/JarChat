@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-04-30 15:00Z by SimPilotAdamT
+ * Last Edited: 2022-04-30 15:10Z by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -23,19 +23,26 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class JarChat extends IRCMessageLoop {
-    static boolean exit;
-    static String input;
-    static String channel = "";
-    static JarChat client;
-    static boolean valid;
     JarChat(String server, int port) {super(server, port);}
     public static void main(String[] args) {
+        boolean exit;
+        String input;
+        String channel = "";
+        JarChat client;
+        boolean valid;
+        Scanner con;
+        String server;
+        String port;
+        String nick;
+        String uname;
+        String name;
+
         System.out.println("\nHi!");
-        Scanner con=new Scanner(System.in);
+        con = new Scanner(System.in);
         System.out.print("\nEnter server IP/Hostname: ");
-        String server = con.nextLine();
+        server = con.nextLine();
         System.out.print("Enter server port: ");
-        String port = con.nextLine();
+        port = con.nextLine();
         valid = false;
         while(!valid) {
             if (isInteger(port) && port.length() == 4) valid=true;
@@ -46,11 +53,11 @@ public class JarChat extends IRCMessageLoop {
         }
 
         System.out.print("\nEnter nickname: ");
-        String nick=con.nextLine();
+        nick = con.nextLine();
         System.out.print("Enter username: ");
-        String uname=con.nextLine();
+        uname = con.nextLine();
         System.out.print("Enter real name: ");
-        String name=con.nextLine();
+        name = con.nextLine();
         System.out.print("\n");
 
         client = new JarChat(server, Integer.parseInt(port));
@@ -69,18 +76,20 @@ public class JarChat extends IRCMessageLoop {
                 channel=input.substring(6);
                 client.join(channel);
             }
-            else if (input.equalsIgnoreCase("/leave") && !channel.isEmpty()) client.part(channel);
             else if (input.startsWith("/msg ")) {
                 input = input.substring(5);
                 String[] message = input.split(" ",2);
                 privmsg(message[0],message[1],nick);
             }
+            else if (input.startsWith("/me ") && !channel.isEmpty()) privmsg(channel,"*"+input.substring(4)+"*",nick);
+            else if (input.equalsIgnoreCase("/leave") && !channel.isEmpty()) client.part(channel);
             else if (!channel.isEmpty()) privmsg(channel,input,nick);
+            else System.out.println("Last input disregarded");
         }
         con.close();
         System.exit(0);
     }
-    private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
+    private static boolean isInteger(String input){try{Integer.parseInt(input);return true;}catch(Exception ignored){return false;}}
 }
 
 // All the classes below this line are taken from Kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
