@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-04-30 13:23Z by SimPilotAdamT
+ * Last Edited: 2022-04-30 15:00Z by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -25,7 +25,7 @@ import java.util.Scanner;
 public class JarChat extends IRCMessageLoop {
     static boolean exit;
     static String input;
-    static String channel;
+    static String channel = "";
     static JarChat client;
     static boolean valid;
     JarChat(String server, int port) {super(server, port);}
@@ -55,7 +55,7 @@ public class JarChat extends IRCMessageLoop {
 
         client = new JarChat(server, Integer.parseInt(port));
         client.nick(nick);
-        try {client.user(uname, InetAddress.getLocalHost().getHostName(), name);} catch (UnknownHostException e) {client.user(uname, "null", name);}
+        try {client.user(uname, InetAddress.getLocalHost().getHostName(), name);} catch (UnknownHostException ignored) {client.user(uname, "null", name);}
         client.start();
         exit = false;
         while (!exit) {
