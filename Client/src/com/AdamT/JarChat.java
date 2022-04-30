@@ -16,7 +16,9 @@ import com.sun.istack.internal.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -25,14 +27,41 @@ public class JarChat extends IRCMessageLoop {
     static boolean exit;
     static String input;
     static String channel;
+    static JarChat client;
+    static boolean valid;
     JarChat(String server, int port) {super(server, port);}
     public static void main(String[] args) {
         System.out.println("\nHi!");
         Scanner con=new Scanner(System.in);
-        System.out.print("\nEnter server IP/Hostname: ");String server = con.nextLine();System.out.print("Enter server port: ");String port = con.nextLine();
-        boolean valid=false;while(!valid){if(isInteger(port)&&port.length()==4)valid=true;else{System.out.print("\n\nError! Invalid port!\nEnter server port: ");port=con.nextLine();}}
-        System.out.print("\nEnter nickname: ");String nick=con.nextLine();System.out.print("Enter username: ");String uname=con.nextLine();System.out.print("Enter real name: ");String name=con.nextLine();
-        System.out.print("\n");JarChat client=new JarChat(server,Integer.parseInt(port));client.nick(nick);client.user(uname,"null","null",name);client.start();
+        System.out.print("\nEnter server IP/Hostname: ");
+        String server = con.nextLine();
+        System.out.print("Enter server port: ");
+        String port = con.nextLine();
+        valid = false;
+        while(!valid) {
+            if (isInteger(port) && port.length() == 4) valid=true;
+            else {
+                System.out.print("\n\nError! Invalid port!\nEnter server port: ");
+                port=con.nextLine();
+            }
+        }
+
+        System.out.print("\nEnter nickname: ");
+        String nick=con.nextLine();
+        System.out.print("Enter username: ");
+        String uname=con.nextLine();
+        System.out.print("Enter real name: ");
+        String name=con.nextLine();
+        System.out.print("\n");
+
+        client = new JarChat(server, Integer.parseInt(port));
+        client.nick(nick);
+        try {
+            client.user(uname, InetAddress.getLocalHost().getHostName(), name);
+        } catch (UnknownHostException e) {
+            client.user(uname, "null", name);
+        }
+        client.start();
         exit = false;
         while (!exit) {
             input = con.nextLine();
@@ -54,7 +83,7 @@ public class JarChat extends IRCMessageLoop {
     private static boolean isInteger(String input) {try {Integer.parseInt(input);return true;} catch(Exception e) {return false;}}
 }
 
-// All the classes below this line are taken from kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
+// All the classes below this line are taken from Kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
 abstract class IRCMessageLoop extends Thread {
     Socket server;
     static OutputStream out;
@@ -67,7 +96,7 @@ abstract class IRCMessageLoop extends Thread {
 
     void nick(String nickname) {String msg = "NICK " + nickname;send(msg);}
 
-    void user(String username, String hostname, String servername, String realname) {String msg = "USER " + username + " " + hostname + " " + servername +  " :" + realname;send(msg);}
+    void user(String username, String hostname, String realname) {String msg = "USER " + username + " " + hostname + " " + "null" +  " :" + realname;send(msg);}
 
     void join(String channel) {if (!initial_setup_status) {channelList.add(channel);return;}String msg = "JOIN " + channel;send(msg);}
 
@@ -79,7 +108,7 @@ abstract class IRCMessageLoop extends Thread {
 
     static void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
 
-    void initial_setup() {initial_setup_status = true;for (Object channel: channelList) {join((String) channel);}} // now join the channels. you need to wait for message 001 before you join a channel.
+    void initial_setup() {initial_setup_status = true;for (String channel: channelList) {join(channel);}} // now join the channels. you need to wait for message 001 before you join a channel.
 
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
@@ -107,7 +136,9 @@ abstract class IRCMessageLoop extends Thread {
     }
 }
 
-class Message {public String origin;public String nickname;public String command;public String target;public String content;}
+class Message {public String origin;public String nickname;public String command;
+    @SuppressWarnings("unused")
+    public String target;public String content;}
 
 class MessageBuffer {String buffer;public MessageBuffer() {buffer = "";}public void append(byte[] bytes) {buffer += new String(bytes);}public boolean hasCompleteMessage() {return buffer.contains("\r\n");}public String getNextMessage() {int index = buffer.indexOf("\r\n");String message = "";if (index > -1) {message = buffer.substring(0, index);buffer = buffer.substring(index + 2);}return message;}}
 
