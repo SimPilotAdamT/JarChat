@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JDK 11.
  *
- * Last Edited: 2022-04-30 15:10Z by SimPilotAdamT
+ * Last Edited: 2022-04-30 23:30Z by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.net.ssl.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -94,12 +95,29 @@ public class JarChat extends IRCMessageLoop {
 
 // All the classes below this line are taken from Kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772
 abstract class IRCMessageLoop extends Thread {
-    Socket server;
+    //Socket server;
     static OutputStream out;
     ArrayList<String> channelList;
     boolean initial_setup_status;
+    InputStream stream;
 
-    IRCMessageLoop(String serverName, int port) {channelList = new ArrayList<>();try {server = new Socket(serverName, port);out = server.getOutputStream();} catch (IOException info) {info.printStackTrace();}}
+    IRCMessageLoop(String serverName, int port) {
+        channelList = new ArrayList<>();
+        try {
+            if (port == 6697 || port == 7000 || port == 7070){
+                SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+                SSLSocket server = (SSLSocket)factory.createSocket(serverName, port);
+                server.startHandshake();
+                out = server.getOutputStream();
+                stream = server.getInputStream();
+            }
+            else {
+                Socket server = new Socket(serverName, port);
+                out = server.getOutputStream();
+                stream = server.getInputStream();
+            }
+        } catch (Exception info) {info.printStackTrace();}
+    }
 
     static void send(String text) {byte[] bytes = (text + "\r\n").getBytes();try {out.write(bytes);} catch (IOException info) {info.printStackTrace();}}
 
@@ -129,9 +147,7 @@ abstract class IRCMessageLoop extends Thread {
     }
 
     public void run() {
-        InputStream stream;
         try {
-            stream = server.getInputStream();
             MessageBuffer messageBuffer = new MessageBuffer();
             byte[] buffer = new byte[512];
             int count;
