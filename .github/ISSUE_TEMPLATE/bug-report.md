@@ -26,9 +26,9 @@ If applicable, add screenshots to help explain your problem.
 **Computer (please complete the following information):**
  - Type: [laptop/desktop]
  - CPU: [e.g. Intel Core i9-10900K]
- - RAM: [e.g. 2x16GB DDR4-3200 CL16]
+ - RAM: [e.g. 2x16GB DDR4-3200 with timings 16-19-20-37]
  - GPU: [e.g. MSI Ventus 3X GeForce RTX 3080 10GB OC, Intel UHD 630, AMD Radeon RX570]
- - Java Version: [e.g. JRE 1.8.0 release 301]
+ - Java Version: [e.g. JRE 1.8.0 release 332]
 
 **Additional context**
 Add any other context about the problem here.
