@@ -100,10 +100,7 @@ class MessageBuffer {
     public String getNextMessage() {
         int index = buffer.indexOf("\r\n");
         String message = "";
-        if (index > -1) {
-            message = buffer.substring(0, index);
-            buffer = buffer.substring(index + 2);
-        }
+        if (index > -1) { message = buffer.substring(0, index); buffer = buffer.substring(index + 2); }
         return message;
     }
 }
@@ -122,17 +119,12 @@ class MessageParser {
             }
         }
         spIndex = ircMessage.indexOf(' ');
-        if (spIndex == -1) {
-            message.command = "null";
-            return message;
-        }
+        if (spIndex == -1) { message.command = "null"; return message; }
         message.command = ircMessage.substring(0, spIndex).toLowerCase();
         ircMessage = ircMessage.substring(spIndex + 1);
         // Parse privmsg parameters
         if (message.command.equals("privmsg")) {
-            spIndex = ircMessage.indexOf(' ');
-            message.target = ircMessage.substring(0, spIndex);
-            ircMessage = ircMessage.substring(spIndex + 1);
+            spIndex = ircMessage.indexOf(' '); message.target = ircMessage.substring(0, spIndex); ircMessage = ircMessage.substring(spIndex + 1);
             if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
             else message.content = ircMessage;
         }

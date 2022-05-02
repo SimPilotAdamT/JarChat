@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JRE 11.
  *
- * Last Edited: 2022-05-02 14:13Z by SimPilotAdamT
+ * Last Edited: 2022-05-02 15:05 by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -23,25 +23,16 @@ public class JarChat extends IRCMessageLoop {
         boolean exit; String input; String channel = ""; JarChat client; boolean valid; Scanner con; String server; String port; String nick; String uname; String name;
 
         // Welcome and entering server details
-        System.out.println("\nHi!");
-        con = new Scanner(System.in);
-        System.out.print("\nEnter server IP/Hostname: ");
-        server = con.nextLine();
-        System.out.print("Enter server port: ");
-        port = con.nextLine();
-        valid = false;
+        System.out.println("\nHi!"); con = new Scanner(System.in); System.out.print("\nEnter server IP/Hostname: ");
+        server = con.nextLine(); System.out.print("Enter server port: "); port = con.nextLine();
 
         // Check the port is valid (most servers use a port with 4 digits
+        valid = false;
         while(!valid) { if (isInteger(port) && port.length() == 4) valid=true; else { System.out.print("Error! Invalid port!\nEnter server port: "); port=con.nextLine(); } }
 
         // Get user's details
-        System.out.print("\nEnter nickname: ");
-        nick = con.nextLine();
-        System.out.print("Enter username (most of the time this is the same as the nickname): ");
-        uname = con.nextLine();
-        System.out.print("Enter real name: ");
-        name = con.nextLine();
-        System.out.print("\n");
+        System.out.print("\nEnter nickname: "); nick = con.nextLine(); System.out.print("Enter username (most of the time this is the same as the nickname): ");
+        uname = con.nextLine(); System.out.print("Enter real name: "); name = con.nextLine(); System.out.print("\n");
 
         // Start the connection
         client = new JarChat(server, Integer.parseInt(port)); client.nick(nick);
@@ -53,10 +44,9 @@ public class JarChat extends IRCMessageLoop {
         while (!exit) {
             input = con.nextLine();
             if (input.equalsIgnoreCase("/quit")) { exit=true; quit("JarChat Client Terminated"); } // Exit the program should the user send the command
-            else if (input.startsWith("/join ")){
-                if (!channel.isEmpty()) client.part(channel);
-                channel=input.substring(6); // Remove the "/join " part of the command
-                client.join(channel);
+            else if (input.startsWith("/join ")) {
+                if (!channel.isEmpty()) client.part(channel); // Part from the current channel if joined
+                channel=input.substring(6); client.join(channel); // Remove the "/join " part of the command, then join the channel
             }
             else if (input.startsWith("/msg ")) {
                 input = input.substring(5); // Remove the "/msg " part of the command
@@ -73,5 +63,5 @@ public class JarChat extends IRCMessageLoop {
         con.close();
         System.exit(0);
     }
-    private static boolean isInteger(String input){ try { Integer.parseInt(input); return true; } catch (Exception ignored) { return false; } } // To check if the port is a valid number
+    private static boolean isInteger(String input) { try { Integer.parseInt(input); return true; } catch (Exception ignored) { return false; } } // To check if the port is a valid number
 }
