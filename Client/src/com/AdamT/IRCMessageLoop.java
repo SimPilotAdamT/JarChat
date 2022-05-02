@@ -44,28 +44,29 @@ abstract class IRCMessageLoop extends Thread {
         try { out.write(bytes); } catch (IOException info) { info.printStackTrace(); } // Try to send the message, and print out error info if it fails (without exiting the program)
     }
     void nick(String nickname) { String msg = "NICK " + nickname; send(msg); } // Set the nickname as seen by the server and other users
-    void user(String username, String hostname, String realname) {String msg = "USER " + username + " " + hostname + " " + "null" +  " :" + realname;send(msg);}
-    void join(String channel) {if (!initial_setup_status) {channelList.add(channel);return;}String msg = "JOIN " + channel;send(msg);}
-    void part(String channel) {String msg = "PART " + channel;send(msg);}
-    static void privmsg(String to, String text, @Nullable String from) {String msg = "PRIVMSG " + to + " :" + text;send(msg);System.out.println("PRIVMSG: " + from + ": " + text);}
-    void pong(String server) {String msg = "PONG " + server;send(msg);}
-    static void quit(String reason) {String msg = "QUIT :Quit: " + reason;send(msg);}
+    // Set the rest of the user's info
+    void user(String username, String hostname, String real_name) { String msg = "USER " + username + " " + hostname + " " + "null" +  " :" + real_name; send(msg); }
+    void join(String channel) { if (!initial_setup_status) { channelList.add(channel); return; } String msg = "JOIN " + channel; send(msg); } // Join the channel as requested by the user
+    void part(String channel) { String msg = "PART " + channel; send(msg); } // Leave the channel as requested by the user, without disconnecting from the server
+    // Send messages, either directly or as a DM
+    static void privmsg(String to, String text, @Nullable String from) { String msg = "PRIVMSG " + to + " :" + text; send(msg); System.out.println("PRIVMSG: " + from + ": " + text); }
+    void pong(String server) { String msg = "PONG " + server; send(msg); } // Respond back to the server every few minutes to ensure the connection isn't forcibly removed
+    static void quit(String reason) { String msg = "QUIT :Quit: " + reason; send(msg); } // Disconnect from the server as requested by the user
     void initial_setup() {
         initial_setup_status = true;
-        for (String channel: channelList) {join(channel);} // now join the channels. you need to wait for message 001 before you join a channel.
+        for (String channel: channelList) { join(channel); } // Now you can join the channels. You need to wait for message 001 before you join a channel.
     }
+    // Method to call the other methods here as required depending on the message received from the server or other users.
     void processMessage(String ircMessage) {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
-            case "privmsg": if (msg.content.equals("\001VERSION\001")) {
-                privmsg(msg.nickname, "JarChat",null);
-                return;
-            }
-            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content);break;
-            case "001": initial_setup();break;
-            case "ping": pong(msg.content);break;
+            case "privmsg": if (msg.content.equals("\001VERSION\001")) { privmsg(msg.nickname, "JarChat",null); return; } // Reflect this client's name in the response
+            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content); break; // Show the recieved message in the log
+            case "001": initial_setup(); break; // Initial message as sent by the server
+            case "ping": pong(msg.content);break; // see comment on line 53
         }
     }
+
     public void run() {
         try {
             MessageBuffer messageBuffer = new MessageBuffer();
