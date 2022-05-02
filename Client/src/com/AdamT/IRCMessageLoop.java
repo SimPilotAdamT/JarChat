@@ -61,7 +61,7 @@ abstract class IRCMessageLoop extends Thread {
         Message msg = MessageParser.message(ircMessage);
         switch (msg.command) {
             case "privmsg": if (msg.content.equals("\001VERSION\001")) { privmsg(msg.nickname, "JarChat",null); return; } // Reflect this client's name in the response
-            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content); break; // Show the recieved message in the log
+            System.out.println("PRIVMSG: " + msg.nickname + ": " + msg.content); break; // Show the received message in the console log
             case "001": initial_setup(); break; // Initial message as sent by the server
             case "ping": pong(msg.content);break; // see comment on line 53
         }
@@ -74,8 +74,9 @@ abstract class IRCMessageLoop extends Thread {
             int count;
             while (true) {
                 count = stream.read(buffer);
-                if (count == -1) break;
+                if (count == -1) break; // There is nothing being sent by the server, so no need to continue the loop
                 messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
+                // Process every complete IRC message in the message buffer
                 while (messageBuffer.hasCompleteMessage()) {
                     String ircMessage = messageBuffer.getNextMessage();
                     System.out.println("\"" + ircMessage + "\"");
@@ -83,16 +84,19 @@ abstract class IRCMessageLoop extends Thread {
                 }
             }
         }
-        catch (IOException info) {quit("error in messageLoop");info.printStackTrace();}
+        catch (IOException info) { quit("error in messageLoop"); info.printStackTrace(); System.exit(1); } // We cannot continue execution, so we disconnect and halt execution.
     }
 }
 
-class Message {public String origin;public String nickname;public String command;@SuppressWarnings("unused") public String target;public String content;}
+// This class just sets all the attributes assigned to each message
+class Message { public String origin; public String nickname; public String command; @SuppressWarnings("unused") public String target; public String content; }
 
+// This class ensures the program can deal with every message one at a time
 class MessageBuffer {
-    String buffer;public MessageBuffer() {buffer = "";}
-    public void append(byte[] bytes) {buffer += new String(bytes);}
-    public boolean hasCompleteMessage() {return buffer.contains("\r\n");}
+    String buffer;
+    public MessageBuffer() { buffer = ""; } // At the start, there should be nothing in the buffer, data will be appended to this as the execution progresses
+    public void append(byte[] bytes) { buffer += new String(bytes); }
+    public boolean hasCompleteMessage() { return buffer.contains("\r\n"); } // The end of every complete message always has a CRLF line ending
     public String getNextMessage() {
         int index = buffer.indexOf("\r\n");
         String message = "";
@@ -104,11 +108,10 @@ class MessageBuffer {
     }
 }
 
-// class only parses messages it understands. if a message is not understood
-// the origin and command are extracted and parsing halts.
+// This class only parses messages it understands. If a message is not understood, the origin and command are extracted and parsing halts.
 class MessageParser {
     static Message message(String ircMessage) {
-        Message message = new Message();int spIndex;
+        Message message = new Message(); int spIndex;
         if (ircMessage.startsWith(":")) {
             spIndex = ircMessage.indexOf(' ');
             if (spIndex > -1) {
@@ -125,7 +128,7 @@ class MessageParser {
         }
         message.command = ircMessage.substring(0, spIndex).toLowerCase();
         ircMessage = ircMessage.substring(spIndex + 1);
-        // parse privmsg params
+        // Parse privmsg parameters
         if (message.command.equals("privmsg")) {
             spIndex = ircMessage.indexOf(' ');
             message.target = ircMessage.substring(0, spIndex);
@@ -133,12 +136,12 @@ class MessageParser {
             if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
             else message.content = ircMessage;
         }
-        // parse quit/join
+        // Parse quit/join
         if (message.command.equals("quit") || message.command.equals("join")) {
             if (ircMessage.startsWith(":")) message.content = ircMessage.substring(1);
             else message.content = ircMessage;
         }
-        // parse ping params
+        // Parse ping parameters
         if (message.command.equals("ping")) {
             spIndex = ircMessage.indexOf(' ');
             if (spIndex > -1) message.content = ircMessage.substring(0, spIndex);

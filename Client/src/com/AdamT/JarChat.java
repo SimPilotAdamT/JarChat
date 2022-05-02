@@ -5,7 +5,7 @@
  * Build using the latest JDK 8 to ensure compatibility with all
  * modern devices. Will change JDK once more devices use JRE 11.
  *
- * Last Edited: 2022-05-02 13:33Z by SimPilotAdamT
+ * Last Edited: 2022-05-02 14:00Z by SimPilotAdamT
  */
 
 package com.AdamT;
@@ -19,8 +19,7 @@ import java.util.Scanner;
 public class JarChat extends IRCMessageLoop {
     JarChat(String server, int port) {super(server, port);}
     public static void main(String[] args) {
-
-        // Variables (local to here instead of local to the class in case any variables with these names are required elsewhere)
+        // Variables (local to this method instead of the class in case any variables with these names or similar are required elsewhere)
         boolean exit; String input; String channel = ""; JarChat client; boolean valid; Scanner con; String server; String port; String nick; String uname; String name;
 
         // Welcome and entering server details
@@ -31,6 +30,7 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("Enter server port: ");
         port = con.nextLine();
         valid = false;
+
         // Check the port is valid (most servers use a port with 4 digits
         while(!valid) { if (isInteger(port) && port.length() == 4) valid=true; else { System.out.print("Error! Invalid port!\nEnter server port: "); port=con.nextLine(); } }
 
@@ -44,7 +44,7 @@ public class JarChat extends IRCMessageLoop {
         System.out.print("\n");
 
         // Start the connection
-        client = new JarChat(server, Integer.parseInt(port));client.nick(nick);
+        client = new JarChat(server, Integer.parseInt(port)); client.nick(nick);
         try { client.user(uname, InetAddress.getLocalHost().getHostName(), name); } catch (UnknownHostException ignored) { client.user(uname, "null", name); } client.start();
 
         // String.equalsIgnoreCase() is used instead of String.equals() because this will save the user lots of hassle with typing commands
@@ -67,6 +67,7 @@ public class JarChat extends IRCMessageLoop {
             else if (!channel.isEmpty()) privmsg(channel,input,nick); // Send a message to the channel the user is in
             else System.out.println("Join a channel before sending messages!"); // Suitable message to let the user know that they aren't in any channel
         }
+
         // Ensure everything closes gracefully
         con.close();
         System.exit(0);
