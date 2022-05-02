@@ -1,3 +1,6 @@
+// All of these classes are taken from Kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772,
+// with my own edits to ensure they better suited for use as an actual client, as well as to add comments to the code.
+
 package com.AdamT;
 
 // Imports
@@ -11,32 +14,36 @@ import javax.net.ssl.SSLSocketFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// All of these classes are taken from Kaecy's gist at https://gist.github.com/kaecy/286f8ad334aec3fcb588516feb727772,
-// with my own edits to ensure they better suited for use as an actual client.
 abstract class IRCMessageLoop extends Thread {
+    // Variables (local to the class as many methods require them)
     static OutputStream out;
-    ArrayList<String> channelList;
+    ArrayList<String> channelList = new ArrayList<>();
     boolean initial_setup_status;
     InputStream stream;
     IRCMessageLoop(String serverName, int port) {
-        channelList = new ArrayList<>();
-        try {
-            if (port == 6697 || port == 7000 || port == 7070){
+        try { // Both outcomes of this if statement can throw exceptions, so need to be encased in a try-catch
+            if (port == 6697 || port == 7000 || port == 7070){ // Connection is a TLS connection
+                // Initialise and start the secure socket
                 SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
                 SSLSocket server = (SSLSocket)factory.createSocket(serverName, port);
                 server.startHandshake();
+                // Allow the program to read everything being received from the socket, as well as to send info back to the server
                 out = server.getOutputStream();
                 stream = server.getInputStream();
             }
             else {
-                Socket server = new Socket(serverName, port);
+                Socket server = new Socket(serverName, port); // Initialise plaintext connection (this is automatically started)
+                // Allow the program to read everything being received from the socket, as well as to send info back to the server
                 out = server.getOutputStream();
                 stream = server.getInputStream();
             }
-        } catch (Exception info) {info.printStackTrace();}
+        } catch (Exception info) { info.printStackTrace(); } // Print information about the error to the terminal for debugging in case it's needed
     }
-    static void send(String text) {byte[] bytes = (text + "\r\n").getBytes();try {out.write(bytes);} catch (IOException info) {info.printStackTrace();}}
-    void nick(String nickname) {String msg = "NICK " + nickname;send(msg);}
+    static void send(String text) {
+        byte[] bytes = (text + "\r\n").getBytes(); // Ensure the message being sent ends with a CRLF line break and not na LF line break
+        try { out.write(bytes); } catch (IOException info) { info.printStackTrace(); } // Try to send the message, and print out error info if it fails (without exiting the program)
+    }
+    void nick(String nickname) { String msg = "NICK " + nickname; send(msg); } // Set the nickname as seen by the server and other users
     void user(String username, String hostname, String realname) {String msg = "USER " + username + " " + hostname + " " + "null" +  " :" + realname;send(msg);}
     void join(String channel) {if (!initial_setup_status) {channelList.add(channel);return;}String msg = "JOIN " + channel;send(msg);}
     void part(String channel) {String msg = "PART " + channel;send(msg);}
