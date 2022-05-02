@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 // Main class
 public class JarChat extends IRCMessageLoop {
-    JarChat(String server, int port) {super(server, port);}
+    JarChat(String server, int port) { super(server, port); }
     public static void main(String[] args) {
         // Variables (local to this method instead of the class in case any variables with these names or similar are required elsewhere)
         boolean exit; String input; String channel = ""; JarChat client; boolean valid; Scanner con; String server; String port; String nick; String uname; String name;
