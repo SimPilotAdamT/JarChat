@@ -48,6 +48,7 @@ public class JarChat extends IRCMessageLoop {
         try { client.user(uname, InetAddress.getLocalHost().getHostName(), name); } catch (UnknownHostException ignored) { client.user(uname, "null", name); } client.start();
 
         // String.equalsIgnoreCase() is used instead of String.equals() because this will save the user lots of hassle with typing commands
+        // A long if statement is used instead of a switch statement die to the String.startsWith() method being called, making a switch statement impossible
         exit = false;
         while (!exit) {
             input = con.nextLine();
