@@ -21,8 +21,10 @@ abstract class IRCMessageLoop extends Thread {
     boolean initial_setup_status;
     InputStream stream;
     IRCMessageLoop(String serverName, int port) {
-        try { // Both outcomes of this if statement can throw exceptions, so need to be encased in a try-catch
-            if (port == 6697 || port == 7000 || port == 7070){ // Connection is a TLS connection
+        // Both outcomes of this if statement can throw exceptions, so need to be encased in a try-catch statement
+        try {
+            // These ports are exclusively used by encrypted TLS connections
+            if (port == 6697 || port == 7000 || port == 7070){
                 // Initialise and start the secure socket
                 SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
                 SSLSocket server = (SSLSocket)factory.createSocket(serverName, port);
@@ -31,6 +33,7 @@ abstract class IRCMessageLoop extends Thread {
                 out = server.getOutputStream();
                 stream = server.getInputStream();
             }
+            // Any other ports are going to be plaintext connections, so do not need SSL Sockets
             else {
                 Socket server = new Socket(serverName, port); // Initialise plaintext connection (this is automatically started)
                 // Allow the program to read everything being received from the socket, as well as to send info back to the server
