@@ -87,7 +87,7 @@ abstract class IRCMessageLoop extends Thread {
                 }
             }
         }
-        catch (IOException info) { quit("error in messageLoop"); info.printStackTrace(); System.exit(1); } // We cannot continue execution, so we disconnect and halt execution.
+        catch (IOException info) { quit("error in IRCMessageLoop"); info.printStackTrace(); System.exit(1); } // We cannot continue execution, so we disconnect and halt execution.
     }
 }
 
